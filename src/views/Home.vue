@@ -206,7 +206,8 @@ export default {
           hash: hash
         })
         .then(res => {
-          console.log("getReportData-res: ", res);
+          this.$set(this, "morning", res[0]);
+          this.$set(this, "afternoon", res[1]);
         });
     },
     /**
@@ -239,7 +240,7 @@ export default {
           console.log("Home-res: ", res);
           window.localStorage.setItem("token", res.token);
           this.getUserInfo();
-          this.getReportData()
+          this.getReportData();
         });
     },
     /**
