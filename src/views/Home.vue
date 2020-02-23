@@ -211,6 +211,7 @@ export default {
         .then(res => {
           this.$set(this, "morning", res[0]);
           this.$set(this, "afternoon", res[1]);
+          this.showCalendar = false;
         });
     },
     /**
@@ -272,7 +273,7 @@ export default {
       this.search_date = this.$moment(
         this.$refs.calendarPicker.getValues()[0]
       ).format("YYYY-MM-DD");
-      this.showCalendar = false;
+      this.getReportData();
     },
     /**
      * 打开日期选择
