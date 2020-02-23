@@ -15,8 +15,8 @@
           <div class="report-time-range">
             上报时间
             <span class="time-range"
-              >{{ morning.reportStartTime.split[" "][1] }}-{{
-                morning.reportEndTime.split[" "][1]
+              >{{ morning.reportStartTime | formatDate }}-{{
+                morning.reportEndTime | formatDate
               }}</span
             >
           </div>
@@ -33,7 +33,7 @@
             >
           </div>
           <p class="report-time" v-if="morning.reportTime">
-            提交时间 <span>{{ morning.reportTime.split[" "][1] }}</span>
+            提交时间 <span>{{ morning.reportTime | formatDate }}</span>
           </p>
         </div>
       </van-cell>
@@ -42,8 +42,8 @@
           <div class="report-time-range">
             上报时间
             <span class="time-range"
-              >{{ afternoon.reportStartTime.split[" "][1] }}-{{
-                afternoon.reportEndTime.split[" "][1]
+              >{{ afternoon.reportStartTime | formatDate }}-{{
+                afternoon.reportEndTime | formatDate
               }}</span
             >
           </div>
@@ -58,7 +58,7 @@
             <span v-else @click="handleReport('afternoon')">未上报</span>
           </div>
           <p class="report-time" v-if="afternoon.reportTime">
-            提交时间 <span>{{ afternoon.reportTime.split[" "][1] }}</span>
+            提交时间 <span>{{ afternoon.reportTime | formatDate }}</span>
           </p>
         </div>
       </van-cell>
@@ -188,6 +188,11 @@ export default {
     this.stu_no = 1;
     this.handleAuth();
     this.getCalendarList();
+  },
+  filters: {
+    formatDate(val) {
+      return val.split[" "][1];
+    }
   },
   methods: {
     /**
