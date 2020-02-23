@@ -239,6 +239,7 @@ export default {
           console.log("Home-res: ", res);
           window.localStorage.setItem("token", res.token);
           this.getUserInfo();
+          this.getReportData()
         });
     },
     /**
