@@ -191,7 +191,7 @@ export default {
   },
   filters: {
     formatDate(val) {
-      return val.split[" "][1];
+      return val.split(" ")[1];
     }
   },
   methods: {
