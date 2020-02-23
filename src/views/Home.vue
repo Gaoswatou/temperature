@@ -4,7 +4,7 @@
       <van-cell>
         <span slot="title">学号：{{ userInfo.stuNo || "" }}</span>
         <span slot="" class="cell-content" @click="selectCalendar">{{
-          searchDate
+          search_date
         }}</span>
       </van-cell>
       <van-cell>
@@ -118,7 +118,7 @@ export default {
   name: "Home",
   data() {
     return {
-      searchDate: "",
+      search_date: "",
       morning: {
         report_start_time: "07:00",
         report_end_time: "07:00",
@@ -193,6 +193,23 @@ export default {
   },
   methods: {
     /**
+     * 获取上报信息
+     */
+    getReportData() {
+      let { random_str, hash, current_time } = this.getHashParams();
+      this.$axios
+        .post("report/info", {
+          stu_no: this.stu_no,
+          search_date: this.search_date,
+          current_time: current_time,
+          random_str: random_str,
+          hash: hash
+        })
+        .then(res => {
+          console.log("getReportData-res: ", res);
+        });
+    },
+    /**
      * 获取学生信息
      */
     getUserInfo() {
@@ -228,7 +245,7 @@ export default {
      * 确认日期
      */
     confirmCalendar() {
-      this.searchDate = this.$moment(
+      this.search_date = this.$moment(
         this.$refs.calendarPicker.getValues()[0]
       ).format("YYYY-MM-DD");
       this.showCalendar = false;
@@ -320,7 +337,7 @@ export default {
         temp.push(`${year}-${month}-${strDate}`);
       }
       this.calendarList = temp;
-      this.searchDate = this.$moment(new Date()).format("YYYY-MM-DD");
+      this.search_date = this.$moment(new Date()).format("YYYY-MM-DD");
     }
   }
 };
