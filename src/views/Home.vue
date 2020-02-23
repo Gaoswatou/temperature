@@ -272,7 +272,11 @@ export default {
             this.report_type === "morning"
               ? this.morning.id
               : this.afternoon.id,
-          reportTemperature: Number(temperature),
+          version:
+            this.report_type === "morning"
+              ? this.morning.version
+              : this.afternoon.version,
+          report_temperature: Number(temperature),
           current_time: current_time,
           random_str: random_str,
           hash: hash
