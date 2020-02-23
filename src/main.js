@@ -15,7 +15,7 @@ Vue.use(Toast);
 
 let toast;
 
-axios.defaults.baseURL = "http://127.0.0.1/dtm/";
+axios.defaults.baseURL = "http://jiangchao.free-http.svipss.top/dtm/";
 //请求拦截器
 axios.interceptors.request.use(
   function(config) {

@@ -196,13 +196,10 @@ export default {
       let { random_str, hash, current_time } = this.getHashParams();
       this.$axios
         .post("student/info", {
-          // 还可以直接把参数拼接在url后边
-          params: {
-            stu_no: stu_no,
-            current_time: current_time,
-            random_str: random_str,
-            hash: hash
-          }
+          stu_no: stu_no,
+          current_time: current_time,
+          random_str: random_str,
+          hash: hash
         })
         .then(function(res) {
           this.goodsList = res.data;
@@ -217,11 +214,8 @@ export default {
     handleAuth() {
       this.$axios
         .post("sys/mLogin", {
-          // 还可以直接把参数拼接在url后边
-          params: {
-            username: "app",
-            password: "Admin123@"
-          }
+          username: "app",
+          password: "Admin123@"
         })
         .then(function(res) {
           this.goodsList = res.data;
@@ -259,13 +253,10 @@ export default {
       let { random_str, hash, current_time } = this.getHashParams();
       this.$axios
         .post("report/update", {
-          // 还可以直接把参数拼接在url后边
-          params: {
-            report_temperature: Number(temperature),
-            current_time: current_time,
-            random_str: random_str,
-            hash: hash
-          }
+          report_temperature: Number(temperature),
+          current_time: current_time,
+          random_str: random_str,
+          hash: hash
         })
         .then(function(res) {
           console.log("res: ", res);
