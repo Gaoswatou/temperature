@@ -19,12 +19,14 @@ axios.defaults.baseURL = "http://jiangchao.free-http.svipss.top/dtm/";
 //请求拦截器
 axios.interceptors.request.use(
   function(config) {
+    console.log("config: ", config);
     toast = Toast.loading({
       forbidClick: true,
       overlay: true
     });
-    // let token = window.localStorage.getItem("token");
-    let token = "123";
+
+    let token = window.localStorage.getItem("token");
+    // let token = "123";
     if (token) {
       config.headers["X-Access-Token"] = token;
     }

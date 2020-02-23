@@ -181,10 +181,12 @@ export default {
       },
       showTemperaturePicker: false,
       showCalendar: false,
-      report_type: "morning"
+      report_type: "morning",
+      stu_no: ""
     };
   },
   mounted() {
+    this.stu_no = this.$route.query.uid;
     this.handleAuth();
     this.getCalendarList();
   },
@@ -218,7 +220,8 @@ export default {
           password: "Admin123@"
         })
         .then(function(res) {
-          this.goodsList = res.data;
+          console.log("Home-res: ", res);
+          window.localStorage.setItem("token", res.data.result.token);
         })
         .catch(function(error) {
           console.log(error);
