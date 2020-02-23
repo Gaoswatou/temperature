@@ -116,14 +116,14 @@ export default {
     return {
       search_date: "",
       morning: {
-        reportStartTime: "07:00",
-        reportEndTime: "07:00",
+        reportStartTime: "",
+        reportEndTime: "",
         reportTemperature: "",
-        reportTime: "07:32:32"
+        reportTime: ""
       },
       afternoon: {
-        reportStartTime: "07:00",
-        reportEndTime: "07:00",
+        reportStartTime: "",
+        reportEndTime: "",
         reportTemperature: "",
         reportTime: ""
       },
@@ -172,8 +172,8 @@ export default {
       ],
       calendarList: [],
       userInfo: {
-        stuNo: "2015000200384",
-        stuName: "黄婷婷"
+        stuNo: "",
+        stuName: ""
       },
       showTemperaturePicker: false,
       showCalendar: false,
@@ -268,6 +268,10 @@ export default {
       let { random_str, hash, current_time } = this.getHashParams();
       this.$axios
         .post("report/update", {
+          id:
+            this.report_type === "morning"
+              ? this.morning.id
+              : this.afternoon.id,
           reportTemperature: Number(temperature),
           current_time: current_time,
           random_str: random_str,
