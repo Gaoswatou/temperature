@@ -260,6 +260,7 @@ export default {
         })
         .then(res => {
           console.log("saveTemperature-res: ", res);
+          // 设置
           // if (this.report_type == "morning") {
           //   this.$set(this.morning, "report_temperature", tempTemper);
           // } else {
