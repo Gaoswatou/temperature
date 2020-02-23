@@ -186,7 +186,8 @@ export default {
     };
   },
   mounted() {
-    this.stu_no = this.$route.query.uid;
+    // this.stu_no = this.$route.query.uid;
+    this.stu_no = 1;
     this.handleAuth();
     this.getCalendarList();
   },
@@ -204,7 +205,8 @@ export default {
           hash: hash
         })
         .then(function(res) {
-          this.goodsList = res.data;
+          console.log("userInfo-res: ", res);
+          this.$set(this, "userInfo", res);
         })
         .catch(function(error) {
           console.log(error);
@@ -221,7 +223,7 @@ export default {
         })
         .then(function(res) {
           console.log("Home-res: ", res);
-          window.localStorage.setItem("token", res.data.result.token);
+          window.localStorage.setItem("token", res.token);
           this.getUserInfo();
         })
         .catch(function(error) {
