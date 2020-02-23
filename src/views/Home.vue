@@ -194,11 +194,11 @@ export default {
     /**
      * 获取学生信息
      */
-    getUserInfo(stu_no) {
+    getUserInfo() {
       let { random_str, hash, current_time } = this.getHashParams();
       this.$axios
         .post("student/info", {
-          stu_no: stu_no,
+          stu_no: this.stu_no,
           current_time: current_time,
           random_str: random_str,
           hash: hash
@@ -222,6 +222,7 @@ export default {
         .then(function(res) {
           console.log("Home-res: ", res);
           window.localStorage.setItem("token", res.data.result.token);
+          this.getUserInfo();
         })
         .catch(function(error) {
           console.log(error);

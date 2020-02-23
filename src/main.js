@@ -19,23 +19,15 @@ axios.defaults.baseURL = "http://127.0.0.1:8080/dtm/";
 //请求拦截器
 axios.interceptors.request.use(
   function(config) {
-    console.log("config: ", config);
     toast = Toast.loading({
       forbidClick: true,
       overlay: true
     });
 
     let token = window.localStorage.getItem("token");
-    // let token = "123";
-    if (token) {
+    if (token && config.url.indexOf("mLogin") === -1) {
       config.headers["X-Access-Token"] = token;
     }
-    // toast = Vue.prototype.$toast({
-    //   type: "loading",
-    //   duration: 0, // 持续展示 toast
-    //   forbidClick: true
-    // });
-    // 在发送请求之前做些什么
     return config;
   },
   function(error) {
@@ -46,12 +38,16 @@ axios.interceptors.request.use(
 
 //响应拦截器
 axios.interceptors.response.use(
-  function(config) {
+  function(res) {
     // 对响应数据做点什么
     setTimeout(() => {
       toast.clear();
     }, 800);
-    return config;
+    if (res.data.code == "200") {
+      return res.data.result;
+    } else {
+      Toast.loading(res.data.message);
+    }
   },
   function(error) {
     // 对响应错误做点什么
