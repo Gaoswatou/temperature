@@ -207,6 +207,25 @@ export default {
         });
     },
     /**
+     * 获取上报信息
+     */
+    getReportDataClearCache() {
+      let { random_str, hash, current_time } = this.getHashParams();
+      this.$axios
+        .post("report/info/clean", {
+          stu_no: this.stu_no,
+          search_date: this.search_date,
+          current_time: current_time,
+          random_str: random_str,
+          hash: hash
+        })
+        .then(res => {
+          this.$set(this, "morning", res[0]);
+          this.$set(this, "afternoon", res[1]);
+          this.showTemperaturePicker = false;
+        });
+    },
+    /**
      * 获取学生信息
      */
     getUserInfo() {
@@ -283,13 +302,13 @@ export default {
         })
         .then(res => {
           console.log("saveTemperature-res: ", res);
-          // 设置
+          // // 设置
           // if (this.report_type == "morning") {
-          //   this.$set(this.morning, "reportTemperature", tempTemper);
+          //   this.$set(this.morning, "reportTemperature", temperature);
           // } else {
-          //   this.$set(this.afternoon, "reportTemperature", tempTemper);
+          //   this.$set(this.afternoon, "reportTemperature", temperature);
           // }
-          // this.showTemperaturePicker = false;
+          this.getReportDataClearCache();
         });
     },
     /**
