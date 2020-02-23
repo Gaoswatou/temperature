@@ -204,12 +204,9 @@ export default {
           random_str: random_str,
           hash: hash
         })
-        .then(function(res) {
+        .then(res => {
           console.log("userInfo-res: ", res);
           this.$set(this, "userInfo", res);
-        })
-        .catch(function(error) {
-          console.log(error);
         });
     },
     /**
@@ -221,13 +218,10 @@ export default {
           username: "app",
           password: "Admin123@"
         })
-        .then(function(res) {
+        .then(res => {
           console.log("Home-res: ", res);
           window.localStorage.setItem("token", res.token);
           this.getUserInfo();
-        })
-        .catch(function(error) {
-          console.log(error);
         });
     },
     /**
@@ -264,17 +258,14 @@ export default {
           random_str: random_str,
           hash: hash
         })
-        .then(function(res) {
-          console.log("res: ", res);
+        .then(res => {
+          console.log("saveTemperature-res: ", res);
           // if (this.report_type == "morning") {
           //   this.$set(this.morning, "report_temperature", tempTemper);
           // } else {
           //   this.$set(this.afternoon, "report_temperature", tempTemper);
           // }
           // this.showTemperaturePicker = false;
-        })
-        .catch(function(error) {
-          console.log(error);
         });
     },
     /**
