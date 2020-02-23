@@ -15,27 +15,23 @@
           <div class="report-time-range">
             上报时间
             <span class="time-range"
-              >{{ morning.report_start_time }}-{{
-                morning.report_end_time
-              }}</span
+              >{{ morning.reportStartTime }}-{{ morning.reportEndTime }}</span
             >
           </div>
           <div class="report-btn">
             <span
-              v-show="morning.report_temperature"
-              :class="
-                Number(morning.report_temperature) < 37.3 ? 'blue' : 'red'
-              "
-              >{{ morning.report_temperature }}°C</span
+              v-show="morning.reportTemperature"
+              :class="Number(morning.reportTemperature) < 37.3 ? 'blue' : 'red'"
+              >{{ morning.reportTemperature }}°C</span
             >
             <span
-              v-show="!morning.report_temperature"
+              v-show="!morning.reportTemperature"
               @click="handleReport('morning')"
               >未上报</span
             >
           </div>
-          <p class="report-time" v-if="morning.report_time">
-            提交时间 <span>{{ morning.report_time }}</span>
+          <p class="report-time" v-if="morning.reportTime">
+            提交时间 <span>{{ morning.reportTime }}</span>
           </p>
         </div>
       </van-cell>
@@ -44,23 +40,23 @@
           <div class="report-time-range">
             上报时间
             <span class="time-range"
-              >{{ afternoon.report_start_time }}-{{
-                afternoon.report_end_time
+              >{{ afternoon.reportStartTime }}-{{
+                afternoon.reportEndTime
               }}</span
             >
           </div>
           <div class="report-btn">
             <span
-              v-if="afternoon.report_temperature"
+              v-if="afternoon.reportTemperature"
               :class="
-                Number(afternoon.report_temperature) < 37.3 ? 'blue' : 'red'
+                Number(afternoon.reportTemperature) < 37.3 ? 'blue' : 'red'
               "
-              >{{ afternoon.report_temperature }}°C</span
+              >{{ afternoon.reportTemperature }}°C</span
             >
             <span v-else @click="handleReport('afternoon')">未上报</span>
           </div>
-          <p class="report-time" v-if="afternoon.report_time">
-            提交时间 <span>{{ afternoon.report_time }}</span>
+          <p class="report-time" v-if="afternoon.reportTime">
+            提交时间 <span>{{ afternoon.reportTime }}</span>
           </p>
         </div>
       </van-cell>
@@ -120,16 +116,16 @@ export default {
     return {
       search_date: "",
       morning: {
-        report_start_time: "07:00",
-        report_end_time: "07:00",
-        report_temperature: "",
-        report_time: "07:32:32"
+        reportStartTime: "07:00",
+        reportEndTime: "07:00",
+        reportTemperature: "",
+        reportTime: "07:32:32"
       },
       afternoon: {
-        report_start_time: "07:00",
-        report_end_time: "07:00",
-        report_temperature: "",
-        report_time: ""
+        reportStartTime: "07:00",
+        reportEndTime: "07:00",
+        reportTemperature: "",
+        reportTime: ""
       },
       temperatureList: [
         "36.0",
@@ -272,7 +268,7 @@ export default {
       let { random_str, hash, current_time } = this.getHashParams();
       this.$axios
         .post("report/update", {
-          report_temperature: Number(temperature),
+          reportTemperature: Number(temperature),
           current_time: current_time,
           random_str: random_str,
           hash: hash
@@ -281,9 +277,9 @@ export default {
           console.log("saveTemperature-res: ", res);
           // 设置
           // if (this.report_type == "morning") {
-          //   this.$set(this.morning, "report_temperature", tempTemper);
+          //   this.$set(this.morning, "reportTemperature", tempTemper);
           // } else {
-          //   this.$set(this.afternoon, "report_temperature", tempTemper);
+          //   this.$set(this.afternoon, "reportTemperature", tempTemper);
           // }
           // this.showTemperaturePicker = false;
         });
