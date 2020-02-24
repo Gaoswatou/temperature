@@ -312,6 +312,16 @@ export default {
           hash: hash
         })
         .then(res => {
+          res.forEach(element => {
+            if (
+              this.$moment(new Date()).isBefore(element.reportStartTime) ||
+              this.$moment(element.reportStartTime).isAfter(new Date())
+            ) {
+              element._disableReport = true;
+            } else {
+              element._disableReport = false;
+            }
+          });
           this.$set(this, "morning", res[0] || {});
           this.$set(this, "afternoon", res[1] || {});
         });
