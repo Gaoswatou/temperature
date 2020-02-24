@@ -8,6 +8,7 @@ import "vant/lib/index.css";
 import moment from "moment";
 import axios from "axios";
 import { Toast } from "vant";
+import "lib-flexible";
 
 Vue.use(Mint);
 Vue.use(Vant);
