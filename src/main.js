@@ -15,7 +15,7 @@ Vue.use(Toast);
 
 let toast;
 
-axios.defaults.baseURL = "http://127.0.0.1:8080/dtm/";
+axios.defaults.baseURL = "https://micro-app.xmmc.edu.cn/dtm/";
 //请求拦截器
 axios.interceptors.request.use(
   function(config) {
@@ -42,11 +42,12 @@ axios.interceptors.response.use(
     // 对响应数据做点什么
     setTimeout(() => {
       toast.clear();
-    }, 800);
+    }, 500);
     if (res.data.code == "200") {
       return res.data.result;
     } else {
-      Toast.loading(res.data.message);
+      Toast.fail(res.data.message);
+      return Promise.reject(res.data.message);
     }
   },
   function(error) {

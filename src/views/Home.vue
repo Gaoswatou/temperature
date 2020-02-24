@@ -1,112 +1,149 @@
 <template>
   <div class="home">
-    <van-cell-group>
-      <van-cell>
-        <span slot="title">学号：{{ userInfo.stuNo || "" }}</span>
-        <span slot="" class="cell-content" @click="selectCalendar">{{
-          search_date
-        }}</span>
-      </van-cell>
-      <van-cell>
-        <span slot="title">姓名：{{ userInfo.stuName || "" }}</span>
-      </van-cell>
-      <van-cell>
-        <div class="report-area">
-          <div class="report-time-range">
-            上报时间
-            <span class="time-range"
-              >{{ morning.reportStartTime | formatDate }}-{{
-                morning.reportEndTime | formatDate
-              }}</span
-            >
+    <van-pull-refresh v-model="isLoading" @refresh="onRefresh">
+      <van-cell-group>
+        <van-cell>
+          <span slot="title">学号：{{ userInfo.stuNo || "" }}</span>
+          <span slot="" class="cell-content" @click="selectCalendar">{{
+            search_date
+          }}</span>
+        </van-cell>
+        <van-cell>
+          <span slot="title">姓名：{{ userInfo.stuName || "" }}</span>
+        </van-cell>
+        <van-cell>
+          <div class="report-area">
+            <div class="report-time-range">
+              上报时间
+              <span class="time-range"
+                >{{ morning.reportStartTime | formatDate }}-{{
+                  morning.reportEndTime | formatDate
+                }}</span
+              >
+            </div>
+            <div class="report-btn">
+              <span
+                v-show="morning.reportTemperature"
+                :class="
+                  Number(morning.reportTemperature) < 37.3 ? 'blue' : 'red'
+                "
+                >{{ morning.reportTemperature }}°C</span
+              >
+              <span
+                v-show="!morning.reportTemperature"
+                :class="morning._disableReport ? 'btn-disable' : ''"
+                @click="handleReport('morning', morning._disableReport)"
+                >未上报</span
+              >
+            </div>
+            <p class="report-time" v-if="morning.reportTime">
+              提交时间 <span>{{ morning.reportTime | formatDate }}</span>
+            </p>
           </div>
-          <div class="report-btn">
-            <span
-              v-show="morning.reportTemperature"
-              :class="Number(morning.reportTemperature) < 37.3 ? 'blue' : 'red'"
-              >{{ morning.reportTemperature }}°C</span
-            >
-            <span
-              v-show="!morning.reportTemperature"
-              @click="handleReport('morning')"
-              >未上报</span
-            >
+        </van-cell>
+        <van-cell>
+          <div class="report-area">
+            <div class="report-time-range">
+              上报时间
+              <span class="time-range"
+                >{{ afternoon.reportStartTime | formatDate }}-{{
+                  afternoon.reportEndTime | formatDate
+                }}</span
+              >
+            </div>
+            <div class="report-btn">
+              <span
+                v-if="afternoon.reportTemperature"
+                :class="
+                  Number(afternoon.reportTemperature) < 37.3 ? 'blue' : 'red'
+                "
+                >{{ afternoon.reportTemperature }}°C</span
+              >
+              <span
+                v-else
+                :class="afternoon._disableReport ? 'btn-disable' : ''"
+                @click="handleReport('afternoon', afternoon._disableReport)"
+                >未上报</span
+              >
+            </div>
+            <p class="report-time" v-if="afternoon.reportTime">
+              提交时间 <span>{{ afternoon.reportTime | formatDate }}</span>
+            </p>
           </div>
-          <p class="report-time" v-if="morning.reportTime">
-            提交时间 <span>{{ morning.reportTime | formatDate }}</span>
-          </p>
-        </div>
-      </van-cell>
-      <van-cell>
-        <div class="report-area">
-          <div class="report-time-range">
-            上报时间
-            <span class="time-range"
-              >{{ afternoon.reportStartTime | formatDate }}-{{
-                afternoon.reportEndTime | formatDate
-              }}</span
-            >
+        </van-cell>
+      </van-cell-group>
+      <van-popup
+        v-model="showTemperaturePicker"
+        closeable
+        close-icon-position="top-left"
+        position="bottom"
+        :style="{ height: '30%' }"
+      >
+        <div class="temperaturePicker">
+          <div class="temperaturePicker-title">体温</div>
+          <div class="temperaturePicker-picker">
+            <van-picker
+              ref="temperaturePicker"
+              :columns="temperatureList"
+              :visible-item-count="4"
+              :default-index="13"
+            />
           </div>
-          <div class="report-btn">
-            <span
-              v-if="afternoon.reportTemperature"
-              :class="
-                Number(afternoon.reportTemperature) < 37.3 ? 'blue' : 'red'
-              "
-              >{{ afternoon.reportTemperature }}°C</span
-            >
-            <span v-else @click="handleReport('afternoon')">未上报</span>
+          <div class="temperaturePicker-confirm_btn">
+            <span @click="confirmTemperature">确定</span>
           </div>
-          <p class="report-time" v-if="afternoon.reportTime">
-            提交时间 <span>{{ afternoon.reportTime | formatDate }}</span>
-          </p>
         </div>
-      </van-cell>
-    </van-cell-group>
-    <van-popup
-      v-model="showTemperaturePicker"
-      closeable
-      close-icon-position="top-left"
-      position="bottom"
-      :style="{ height: '30%' }"
-    >
-      <div class="temperaturePicker">
-        <div class="temperaturePicker-title">体温</div>
-        <div class="temperaturePicker-picker">
-          <van-picker
-            ref="temperaturePicker"
-            :columns="temperatureList"
-            :visible-item-count="4"
-            :default-index="13"
-          />
+      </van-popup>
+      <van-popup
+        v-model="showCalendar"
+        closeable
+        close-icon-position="top-left"
+        position="bottom"
+        :style="{ height: '30%' }"
+      >
+        <div class="temperaturePicker">
+          <div class="temperaturePicker-title">日期</div>
+          <div class="temperaturePicker-picker">
+            <van-picker
+              ref="calendarPicker"
+              :columns="calendarList"
+              :visible-item-count="4"
+              :default-index="13"
+            />
+          </div>
+          <div class="temperaturePicker-confirm_btn">
+            <span @click="confirmCalendar">确定</span>
+          </div>
         </div>
-        <div class="temperaturePicker-confirm_btn">
-          <span @click="confirmTemperature">确定</span>
+      </van-popup>
+      <van-popup v-model="sucReport" round :close-on-click-overlay="false">
+        <div class="info-dialog">
+          <div style="display:flex;justify-content: center;">
+            <van-icon name="checked" size="34" color="#52C7CA" />
+            <div class="info-dialog_text">上报成功</div>
+          </div>
+          <div class="info-dialog_btn suc_btn">
+            <span>({{ second }}秒)自动返回</span>
+          </div>
         </div>
-      </div>
-    </van-popup>
-    <van-popup
-      v-model="showCalendar"
-      closeable
-      close-icon-position="top-left"
-      position="bottom"
-      :style="{ height: '30%' }"
-    >
-      <div class="temperaturePicker">
-        <div class="temperaturePicker-title">日期</div>
-        <div class="temperaturePicker-picker">
-          <van-picker
-            ref="calendarPicker"
-            :columns="calendarList"
-            :visible-item-count="4"
-            :default-index="13"
-          />
+      </van-popup>
+      <van-popup v-model="errReport" round :close-on-click-overlay="false">
+        <div class="info-dialog">
+          <div style="display:flex;justify-content: center;">
+            <van-icon name="clear" size="34" color="#FF4D4D" />
+            <div class="info-dialog_text">上报失败</div>
+          </div>
+          <span
+            style="color:#92969C;font-size: 12px;
+"
+            >请重新上报</span
+          >
+          <div class="info-dialog_btn error_btn">
+            <span>({{ second }}秒)自动返回</span>
+          </div>
         </div>
-        <div class="temperaturePicker-confirm_btn">
-          <span @click="confirmCalendar">确定</span>
-        </div>
-      </div>
-    </van-popup>
+      </van-popup>
+    </van-pull-refresh>
   </div>
 </template>
 
@@ -116,6 +153,12 @@ export default {
   name: "Home",
   data() {
     return {
+      second: 5,
+      secondInterval: null,
+      dateHaveData: "",
+      sucReport: false,
+      errReport: false,
+      isLoading: false,
       search_date: "",
       morning: {
         reportStartTime: "",
@@ -180,21 +223,44 @@ export default {
       showTemperaturePicker: false,
       showCalendar: false,
       report_type: "morning",
-      stu_no: ""
+      stuNo: "",
+      nullResult: null
     };
   },
   mounted() {
-    // this.stu_no = this.$route.query.uid;
-    this.stu_no = 1;
+    this.stuNo = this.$route.query.uid;
+    // this.stu_no = 1;
     this.handleAuth();
     this.getCalendarList();
   },
   filters: {
     formatDate(val) {
-      return val.split(" ")[1];
+      return val ? val.split(" ")[1] : "";
     }
   },
   methods: {
+    /**
+     * 倒计时
+     */
+    startCountdown(type) {
+      type == "suc" ? (this.sucReport = true) : (this.errReport = true);
+      this.secondInterval = setInterval(() => {
+        if (this.second === 0) {
+          clearInterval(this.secondInterval);
+          this.second = 5;
+          type == "suc" ? (this.sucReport = false) : (this.errReport = false);
+          this.getReportDataClearCache();
+        } else {
+          this.second = this.second - 1;
+        }
+      }, 1000);
+    },
+    /**
+     * 下拉刷新
+     */
+    onRefresh() {
+      this.getReportData();
+    },
     /**
      * 获取上报信息
      */
@@ -202,16 +268,34 @@ export default {
       let { random_str, hash, current_time } = this.getHashParams();
       this.$axios
         .post("report/info", {
-          stu_no: this.stu_no,
+          stu_no: this.stuNo,
           search_date: this.search_date,
           current_time: current_time,
           random_str: random_str,
           hash: hash
         })
         .then(res => {
-          this.$set(this, "morning", res[0]);
-          this.$set(this, "afternoon", res[1]);
-          this.showCalendar = false;
+          if (res) {
+            res.forEach(element => {
+              if (
+                this.$moment(new Date()).isBefore(element.reportStartTime) ||
+                this.$moment(element.reportStartTime).isBefore(new Date())
+              ) {
+                element._disableReport = true;
+              } else {
+                element._disableReport = false;
+              }
+            });
+            this.$set(this, "morning", res[0] || {});
+            this.$set(this, "afternoon", res[1] || {});
+            this.isLoading = false;
+            this.dateHaveData = this.search_date;
+          } else {
+            this.search_date = this.dateHaveData;
+          }
+        })
+        .catch(() => {
+          this.isLoading = false;
         });
     },
     /**
@@ -221,16 +305,15 @@ export default {
       let { random_str, hash, current_time } = this.getHashParams();
       this.$axios
         .post("report/info/clean", {
-          stu_no: this.stu_no,
+          stu_no: this.stuNo,
           search_date: this.search_date,
           current_time: current_time,
           random_str: random_str,
           hash: hash
         })
         .then(res => {
-          this.$set(this, "morning", res[0]);
-          this.$set(this, "afternoon", res[1]);
-          this.showTemperaturePicker = false;
+          this.$set(this, "morning", res[0] || {});
+          this.$set(this, "afternoon", res[1] || {});
         });
     },
     /**
@@ -240,13 +323,12 @@ export default {
       let { random_str, hash, current_time } = this.getHashParams();
       this.$axios
         .post("student/info", {
-          stu_no: this.stu_no,
+          stu_no: this.stuNo,
           current_time: current_time,
           random_str: random_str,
           hash: hash
         })
         .then(res => {
-          console.log("userInfo-res: ", res);
           this.$set(this, "userInfo", res);
         });
     },
@@ -260,7 +342,6 @@ export default {
           password: "Admin123@"
         })
         .then(res => {
-          console.log("Home-res: ", res);
           window.localStorage.setItem("token", res.token);
           this.getUserInfo();
           this.getReportData();
@@ -273,6 +354,7 @@ export default {
       this.search_date = this.$moment(
         this.$refs.calendarPicker.getValues()[0]
       ).format("YYYY-MM-DD");
+      this.showCalendar = false;
       this.getReportData();
     },
     /**
@@ -286,6 +368,7 @@ export default {
      */
     confirmTemperature() {
       let tempTemper = this.$refs.temperaturePicker.getValues()[0];
+      this.showTemperaturePicker = false;
       this.saveTemperature(tempTemper);
     },
     /**
@@ -303,20 +386,18 @@ export default {
             this.report_type === "morning"
               ? this.morning.version
               : this.afternoon.version,
+          stu_no: this.stuNo,
           report_temperature: Number(temperature),
           current_time: current_time,
           random_str: random_str,
           hash: hash
         })
         .then(res => {
-          console.log("saveTemperature-res: ", res);
-          // // 设置
-          // if (this.report_type == "morning") {
-          //   this.$set(this.morning, "reportTemperature", temperature);
-          // } else {
-          //   this.$set(this.afternoon, "reportTemperature", temperature);
-          // }
-          this.getReportDataClearCache();
+          this.nullResult = res;
+          this.startCountdown("suc");
+        })
+        .catch(err => {
+          this.startCountdown(err);
         });
     },
     /**
@@ -350,8 +431,12 @@ export default {
     /**
      * 选择温度
      */
-    handleReport(type) {
+    handleReport(type, disableReport) {
       this.report_type = type;
+      if (disableReport) {
+        this.$toast("非上报时间，不可上报");
+        return false;
+      }
       this.showTemperaturePicker = true;
     },
     /**
@@ -385,7 +470,7 @@ export default {
   color: rgba(30, 35, 41, 1);
 }
 .report-area {
-  height: 220px;
+  height: 240px;
   font-size: 14px;
 }
 .report-time-range {
@@ -396,15 +481,16 @@ export default {
   margin-left: 17px;
 }
 .report-btn {
-  height: 110px;
-  line-height: 110px;
+  height: 140px;
+  line-height: 160px;
   text-align: center;
 }
 .report-btn span {
   display: inline-block;
-  width: 115px;
-  height: 28px;
-  line-height: 28px;
+  width: 150px;
+  height: 40px;
+  line-height: 40px;
+  font-size: 16px;
   background: #ffb200;
   border-radius: 50px;
   text-align: center;
@@ -415,6 +501,9 @@ export default {
 }
 .report-btn span.red {
   background: #ff4d4d;
+}
+.report-btn span.btn-disable {
+  background: #92969c;
 }
 .report-time {
   color: rgba(146, 150, 156, 1);
@@ -454,7 +543,43 @@ export default {
   border: 1px solid rgba(82, 199, 202, 1);
   color: #fff;
 }
+.info-dialog {
+  width: 270px;
+  height: 150px;
+  padding-top: 35px;
+  text-align: center;
+}
+.info-dialog_text {
+  margin-left: 5px;
+  font-size: 18px;
+  height: 34px;
+  line-height: 34px;
+  color: #1e2329;
+}
+.info-dialog_btn {
+  text-align: center;
+}
+.info-dialog_btn span {
+  display: inline-block;
+  width: 230px;
+  height: 44px;
+  line-height: 44px;
+  color: #fff;
+  border-radius: 5px;
+}
+.suc_btn span {
+  background-color: rgba(82, 199, 202, 1);
+  margin-top: 20px;
+}
+.error_btn span {
+  background-color: #ff4d4d;
+  margin-top: 2px;
+}
 .van-popup {
   height: auto !important;
+}
+.van-cell {
+  min-height: 40px !important;
+  line-height: 40px !important;
 }
 </style>
