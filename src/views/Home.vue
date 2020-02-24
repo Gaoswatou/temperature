@@ -279,7 +279,7 @@ export default {
             res.forEach(element => {
               if (
                 this.$moment(new Date()).isBefore(element.reportStartTime) ||
-                this.$moment(element.reportStartTime).isBefore(new Date())
+                this.$moment(element.reportStartTime).isAfter(new Date())
               ) {
                 element._disableReport = true;
               } else {
