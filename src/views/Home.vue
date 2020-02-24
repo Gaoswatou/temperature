@@ -397,6 +397,7 @@ export default {
               ? this.morning.version
               : this.afternoon.version,
           stu_no: this.stuNo,
+          search_date: this.search_date,
           report_temperature: Number(temperature),
           current_time: current_time,
           random_str: random_str,
