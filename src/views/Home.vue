@@ -86,7 +86,7 @@
               ref="temperaturePicker"
               :columns="temperatureList"
               :visible-item-count="4"
-              :default-index="28"
+              :default-index="8"
             />
           </div>
           <div class="temperaturePicker-confirm_btn">
