@@ -86,7 +86,7 @@
               ref="temperaturePicker"
               :columns="temperatureList"
               :visible-item-count="4"
-              :default-index="13"
+              :default-index="28"
             />
           </div>
           <div class="temperaturePicker-confirm_btn">
@@ -164,13 +164,15 @@ export default {
         reportStartTime: "",
         reportEndTime: "",
         reportTemperature: "",
-        reportTime: ""
+        reportTime: "",
+        _disableReport: true
       },
       afternoon: {
         reportStartTime: "",
         reportEndTime: "",
         reportTemperature: "",
-        reportTime: ""
+        reportTime: "",
+        _disableReport: true
       },
       temperatureList: [
         "36.0",
@@ -279,7 +281,7 @@ export default {
             res.forEach(element => {
               if (
                 this.$moment(new Date()).isBefore(element.reportStartTime) ||
-                this.$moment(element.reportStartTime).isAfter(new Date())
+                this.$moment(new Date()).isAfter(element.reportEndTime)
               ) {
                 element._disableReport = true;
               } else {
@@ -291,6 +293,9 @@ export default {
             this.isLoading = false;
             this.dateHaveData = this.search_date;
           } else {
+            this.$set(this, "morning", res[0] || { _disableReport: true });
+            this.$set(this, "afternoon", res[1] || { _disableReport: true });
+            this.isLoading = false;
             this.search_date = this.dateHaveData;
           }
         })
@@ -315,7 +320,7 @@ export default {
           res.forEach(element => {
             if (
               this.$moment(new Date()).isBefore(element.reportStartTime) ||
-              this.$moment(element.reportStartTime).isAfter(new Date())
+              this.$moment(new Date()).isAfter(element.reportEndTime)
             ) {
               element._disableReport = true;
             } else {
