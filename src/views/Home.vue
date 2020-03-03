@@ -384,8 +384,22 @@ export default {
      */
     confirmTemperature() {
       let tempTemper = this.$refs.temperaturePicker.getValues()[0];
-      this.showTemperaturePicker = false;
-      this.saveTemperature(tempTemper);
+      let noticeStr = "当前选择体温为" + tempTemper + "°C,确认上报?";
+      if (tempTemper >= 37.3) {
+        this.$dialog
+          .confirm({
+            title: "提示",
+            message: noticeStr
+          })
+          .then(() => {
+            this.showTemperaturePicker = false;
+            this.saveTemperature(tempTemper);
+          })
+          .catch(() => {});
+      } else {
+        this.showTemperaturePicker = false;
+        this.saveTemperature(tempTemper);
+      }
     },
     /**
      * 上传温度
