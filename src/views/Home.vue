@@ -231,8 +231,9 @@ export default {
   },
   mounted() {
     this.stuNo = this.$route.query.uid;
-    // this.stu_no = 1;
-    this.handleAuth();
+    window.localStorage.setItem("token", this.$route.query.token);
+    // this.handleAuth();
+    this.getUserInfo();
     this.getCalendarList();
   },
   filters: {
@@ -472,6 +473,7 @@ export default {
       }
       this.calendarList = temp;
       this.search_date = this.$moment(new Date()).format("YYYY-MM-DD");
+      this.getReportData();
     }
   }
 };
