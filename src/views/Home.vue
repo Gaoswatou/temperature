@@ -296,8 +296,8 @@ export default {
           } else {
             this.$set(this, "morning", res[0] || { _disableReport: true });
             this.$set(this, "afternoon", res[1] || { _disableReport: true });
-            this.isLoading = false;
             this.search_date = this.dateHaveData;
+            this.isLoading = false;
           }
         })
         .catch(() => {
