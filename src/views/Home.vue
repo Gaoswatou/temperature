@@ -232,7 +232,6 @@ export default {
   mounted() {
     this.stuNo = this.$route.query.uid;
     window.localStorage.setItem("token", this.$route.query.token);
-    // this.handleAuth();
     this.getUserInfo();
     this.getCalendarList();
   },
@@ -242,6 +241,24 @@ export default {
     }
   },
   methods: {
+    /**
+     * 日期格式转化为时间戳
+     */
+    getUnixTime(dateStr) {
+      var newstr = dateStr.replace(/-/g, "/");
+      var date = new Date(newstr);
+      var time_str = date.getTime().toString();
+      return time_str.substr(0, 10);
+    },
+    /**
+     * 比较时间大小 aTime是否bTime：如果是，返回true，否则返回false
+     */
+    isBeforeTime(aTime, bTime) {
+      let flag = this.$moment(
+        this.$moment(aTime).format("YYYY-MM-DD HH:mm:ss")
+      ).isBefore(this.$moment(bTime).format("YYYY-MM-DD HH:mm:ss"));
+      return flag;
+    },
     /**
      * 倒计时
      */
@@ -281,8 +298,8 @@ export default {
           if (res) {
             res.forEach(element => {
               if (
-                this.$moment(new Date()).isBefore(element.reportStartTime) ||
-                this.$moment(new Date()).isAfter(element.reportEndTime)
+                this.isBeforeTime(new Date(), element.reportStartTime) ||
+                this.isBeforeTime(element.reportEndTime, new Date())
               ) {
                 element._disableReport = true;
               } else {
@@ -320,8 +337,8 @@ export default {
         .then(res => {
           res.forEach(element => {
             if (
-              this.$moment(new Date()).isBefore(element.reportStartTime) ||
-              this.$moment(new Date()).isAfter(element.reportEndTime)
+              this.isBeforeTime(new Date(), element.reportStartTime) ||
+              this.isBeforeTime(element.reportEndTime, new Date())
             ) {
               element._disableReport = true;
             } else {
@@ -435,7 +452,9 @@ export default {
      * 获取请求参数中的时间戳、salt、hash
      */
     getHashParams() {
-      let current_time = this.$moment().unix();
+      let current_time = this.getUnixTime(
+        this.$moment(Date.now()).format("YYYY-MM-DD HH:mm:ss")
+      );
       let random_str = this.getRandomStr(12);
       let salt = "luqixiuzijiayougan";
       let hash = md5(current_time + random_str + salt);

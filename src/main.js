@@ -5,13 +5,12 @@ import Mint from "bh-mint-ui2";
 import "bh-mint-ui2/lib/style.css";
 import Vant from "vant";
 import "vant/lib/index.css";
-import moment from "moment";
-import "moment/locale/zh-cn";
+import moment from "moment-timezone";
 import axios from "axios";
 import { Toast } from "vant";
 
-moment.locale("zh-cn");
-
+// 将时区设置成亚洲上海
+moment.tz.setDefault("Asia/Shanghai");
 Vue.use(Mint);
 Vue.use(Vant);
 Vue.use(Toast);

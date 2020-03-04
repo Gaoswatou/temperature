@@ -25,6 +25,7 @@
     "eslint-plugin-vue": "^6.1.2",
     "js-md5": "^0.7.3",
     "moment": "^2.24.0",
+    "moment-timezone": "^0.5.28",
     "prettier": "^1.19.1",
     "sass": "^1.25.0",
     "sass-loader": "^8.0.2",
