@@ -365,9 +365,6 @@ export default {
   mounted() {
     this.stuNo = this.$route.query.uid;
     localStorage.setItem("token", this.$route.query.token);
-    let isInfo = localStorage.getItem("isInfo", this.$route.query.token);
-    isInfo && this.setIsInfo(isInfo);
-    !isInfo && this.getIsInfo();
     this.getUserInfo();
     this.getCalendarList();
   },
@@ -646,8 +643,11 @@ export default {
      * 选择温度
      */
     handleReport(type, disableReport) {
+      let isInfo = localStorage.getItem("isInfo", this.$route.query.token);
+      isInfo && this.setIsInfo(isInfo);
+      !isInfo && this.getIsInfo();
       this.report_type = type;
-      this.handleId = type = "morning" ? this.morning.id : this.afternoon.id;
+      this.handleId = type == "morning" ? this.morning.id : this.afternoon.id;
       if (disableReport) {
         this.$toast("非上报时间，不可上报");
         return false;
