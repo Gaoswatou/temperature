@@ -241,7 +241,15 @@
           <ieach-cell title="当前体温">
             <div slot="content">
               <div class="radio-item">
-                <div class="tempVal">{{ temperatureToReport }}</div>
+                <div
+                  class="tempVal"
+                  :class="[
+                    tempVal,
+                    Number(temperatureToReport) < 37.3 ? 'blue' : 'red'
+                  ]"
+                >
+                  {{ temperatureToReport }}
+                </div>
               </div>
             </div>
           </ieach-cell>
@@ -900,8 +908,14 @@ export default {
     line-height: 28px;
     text-align: center;
     color: #fff;
-    background: rgba(82, 199, 202, 1);
+
     border-radius: 50px;
+    &.red {
+      background: #ff4d4d;
+    }
+    &.blue {
+      background: rgba(82, 199, 202, 1);
+    }
   }
 }
 .radioBtn {
