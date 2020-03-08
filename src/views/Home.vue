@@ -382,9 +382,9 @@ export default {
       this.$axios
         .post("report/get_is_info", {
           id: this.handleId,
-          stuNo: this.stuNo,
-          currentTime: current_time,
-          randomStr: random_str,
+          stu_no: this.stuNo,
+          current_time: current_time,
+          random_str: random_str,
           hash: hash
         })
         .then(res => {
@@ -643,11 +643,11 @@ export default {
      * 选择温度
      */
     handleReport(type, disableReport) {
+      this.handleId = type == "morning" ? this.morning.id : this.afternoon.id;
       let isInfo = localStorage.getItem("isInfo", this.$route.query.token);
       isInfo && this.setIsInfo(isInfo);
       !isInfo && this.getIsInfo();
       this.report_type = type;
-      this.handleId = type == "morning" ? this.morning.id : this.afternoon.id;
       if (disableReport) {
         this.$toast("非上报时间，不可上报");
         return false;
