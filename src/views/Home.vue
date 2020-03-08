@@ -382,9 +382,9 @@ export default {
       this.$axios
         .post("report/get_is_info", {
           id: this.handleId,
-          stu_no: this.stuNo,
-          current_time: current_time,
-          random_str: random_str,
+          stuNo: this.stuNo,
+          currentTime: current_time,
+          randomStr: random_str,
           hash: hash
         })
         .then(res => {
