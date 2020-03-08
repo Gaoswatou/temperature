@@ -19,7 +19,7 @@ let toast;
 
 // axios.defaults.baseURL = "https://micro-app.xmmc.edu.cn/dtm/";
 // axios.defaults.baseURL = "https://micro-app-test.xmmc.edu.cn/dtm/";
-axios.defaults.baseURL = "https://localhost:8080/dtm/";
+axios.defaults.baseURL = "http://localhost:8080/dtm/";
 //请求拦截器
 axios.interceptors.request.use(
   function(config) {
