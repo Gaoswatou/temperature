@@ -379,18 +379,18 @@ export default {
      */
     getIsInfo() {
       let { random_str, hash, current_time } = this.getHashParams();
-      this.$axios
-        .post({
-          url: "report/get_is_info",
-          data: {
-            id: this.handleId,
-            stu_no: this.stuNo,
-            current_time: current_time,
-            random_str: random_str,
-            hash: hash
-          },
-          showLoad: false
-        })
+      this.$axios({
+        url: "report/get_is_info",
+        method: "post",
+        data: {
+          id: this.handleId,
+          stu_no: this.stuNo,
+          current_time: current_time,
+          random_str: random_str,
+          hash: hash
+        },
+        showLoad: false
+      })
         .then(res => {
           localStorage.setItem("is_info", res);
           this.setIsInfo(res);
