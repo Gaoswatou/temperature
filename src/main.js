@@ -23,10 +23,12 @@ axios.defaults.baseURL = "http://localhost:8080/dtm/";
 //请求拦截器
 axios.interceptors.request.use(
   function(config) {
-    toast = Toast.loading({
-      forbidClick: true,
-      overlay: true
-    });
+    if (config.showLoad) {
+      toast = Toast.loading({
+        forbidClick: true,
+        overlay: true
+      });
+    }
 
     let token = window.localStorage.getItem("token");
     if (token && config.url.indexOf("mLogin") === -1) {
@@ -44,9 +46,7 @@ axios.interceptors.request.use(
 axios.interceptors.response.use(
   function(res) {
     // 对响应数据做点什么
-    setTimeout(() => {
-      toast.clear();
-    }, 500);
+    toast && toast.clear();
     if (res.data.code == "200") {
       return res.data.result;
     } else {
