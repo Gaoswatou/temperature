@@ -133,24 +133,150 @@
             <van-icon name="clear" size="34" color="#FF4D4D" />
             <div class="info-dialog_text">上报失败</div>
           </div>
-          <span
-            style="color:#92969C;font-size: 12px;
-"
-            >请重新上报</span
-          >
+          <span style="color:#92969C;font-size: 12px;">请重新上报</span>
           <div class="info-dialog_btn error_btn">
             <span>({{ second }}秒)自动返回</span>
           </div>
         </div>
       </van-popup>
+      <ieach-dialog
+        title="流行病史调查"
+        v-model="confirmBeforeSumbit"
+        @before-close="beforeClose"
+        confirmText="提交"
+      >
+        <ieach-cell-group slot="content">
+          <ieach-cell title="本人及所在家庭是否有出现新冠肺炎病例？">
+            <div slot="content" class="radio-item">
+              <div
+                :class="{ radioBtn: true, yes: true, checked: isIll === 1 }"
+                @click="changeRadio('isIll', 1)"
+              >
+                是
+              </div>
+              <div
+                :class="{ radioBtn: true, no: true, checked: isIll === 2 }"
+                @click="changeRadio('isIll', 2)"
+              >
+                否
+              </div>
+            </div>
+          </ieach-cell>
+          <ieach-cell title="是否已治愈出院？">
+            <div slot="content" class="radio-item">
+              <div
+                :class="{
+                  radioBtn: true,
+                  no: true,
+                  checked: isHeal === 2,
+                  raidoDisable: isIll === 2 || !isIll
+                }"
+                @click="changeRadio('isHeal', 2)"
+              >
+                否
+              </div>
+              <div
+                :class="{
+                  radioBtn: true,
+                  yes: true,
+                  checked: isHeal === 1,
+                  raidoDisable: isIll === 2 || !isIll
+                }"
+                @click="changeRadio('isHeal', 1)"
+              >
+                是
+              </div>
+            </div>
+          </ieach-cell>
+          <ieach-cell
+            title="本人及所在家庭成员近14天内是否有接触新冠肺炎病人？"
+          >
+            <div slot="content" class="radio-item">
+              <div
+                :class="{
+                  radioBtn: true,
+                  yes: true,
+                  checked: isTouch === 1
+                }"
+                @click="changeRadio('isTouch', 1)"
+              >
+                是
+              </div>
+              <div
+                :class="{
+                  radioBtn: true,
+                  no: true,
+                  checked: isTouch === 2
+                }"
+                @click="changeRadio('isTouch', 2)"
+              >
+                否
+              </div>
+            </div></ieach-cell
+          >
+          <ieach-cell title="本人所在小区（村）近14天内是否有新冠肺炎病例？">
+            <div slot="content" class="radio-item">
+              <div
+                :class="{
+                  radioBtn: true,
+                  yes: true,
+                  checked: isCommunityIll === 1
+                }"
+                @click="changeRadio('isCommunityIll', 1)"
+              >
+                是
+              </div>
+              <div
+                :class="{
+                  radioBtn: true,
+                  no: true,
+                  checked: isCommunityIll === 2
+                }"
+                @click="changeRadio('isCommunityIll', 2)"
+              >
+                否
+              </div>
+            </div></ieach-cell
+          >
+          <ieach-cell title="当前体温">
+            <div slot="content">
+              <div class="radio-item">
+                <div class="tempVal">{{ temperatureToReport }}</div>
+              </div>
+            </div>
+          </ieach-cell>
+          <ieach-cell>
+            <div slot="container">
+              <div class="promise-check">
+                <van-checkbox
+                  class="promise-check_handle"
+                  v-model="isPromise"
+                  icon-size="24px"
+                ></van-checkbox>
+                <div class="promise-check__text">
+                  我郑重承诺，本人对所报信息的真实性完整性负责。
+                </div>
+              </div>
+            </div>
+          </ieach-cell>
+        </ieach-cell-group>
+      </ieach-dialog>
     </van-pull-refresh>
   </div>
 </template>
 
 <script>
 import md5 from "js-md5";
+import ieachDialog from "components/ieach-dialog/ieach-dialog";
+import ieachCellGroup from "components/ieach-cell-group/ieach-cell-group";
+import ieachCell from "components/ieach-cell/ieach-cell";
 export default {
   name: "Home",
+  components: {
+    ieachDialog,
+    ieachCellGroup,
+    ieachCell
+  },
   data() {
     return {
       second: 5,
@@ -226,12 +352,22 @@ export default {
       showCalendar: false,
       report_type: "morning",
       stuNo: "",
+      temperatureToReport: "36.8",
+      confirmBeforeSumbit: false,
+      isIll: null,
+      isHeal: null,
+      isTouch: null,
+      isCommunityIll: null,
+      isPromise: false,
       nullResult: null
     };
   },
   mounted() {
     this.stuNo = this.$route.query.uid;
-    window.localStorage.setItem("token", this.$route.query.token);
+    localStorage.setItem("token", this.$route.query.token);
+    let isInfo = localStorage.getItem("isInfo", this.$route.query.token);
+    isInfo && this.setIsInfo(isInfo);
+    !isInfo && this.getIsInfo();
     this.getUserInfo();
     this.getCalendarList();
   },
@@ -242,44 +378,28 @@ export default {
   },
   methods: {
     /**
-     * 日期格式转化为时间戳
+     * 获取上次上报的对应选项
      */
-    getUnixTime(dateStr) {
-      var newstr = dateStr.replace(/-/g, "/");
-      var date = new Date(newstr);
-      var time_str = date.getTime().toString();
-      return time_str.substr(0, 10);
+    getIsInfo() {
+      this.$axios
+        .post("report/get_is_info", {})
+        .then(res => {
+          localStorage.setItem("is_info", res);
+          this.setIsInfo(res);
+        })
+        .catch(() => {
+          this.isLoading = false;
+        });
     },
     /**
-     * 比较时间大小 aTime是否bTime：如果是，返回true，否则返回false
+     * 将缓存里面表单的默认选项读出来
      */
-    isBeforeTime(aTime, bTime) {
-      let flag = this.$moment(
-        this.$moment(aTime).format("YYYY-MM-DD HH:mm:ss")
-      ).isBefore(this.$moment(bTime).format("YYYY-MM-DD HH:mm:ss"));
-      return flag;
-    },
-    /**
-     * 倒计时
-     */
-    startCountdown(type) {
-      type == "suc" ? (this.sucReport = true) : (this.errReport = true);
-      this.secondInterval = setInterval(() => {
-        if (this.second === 0) {
-          clearInterval(this.secondInterval);
-          this.second = 5;
-          type == "suc" ? (this.sucReport = false) : (this.errReport = false);
-          this.getReportDataClearCache();
-        } else {
-          this.second = this.second - 1;
-        }
-      }, 1000);
-    },
-    /**
-     * 下拉刷新
-     */
-    onRefresh() {
-      this.getReportData();
+    setIsInfo(info) {
+      this.isIll = info.isIll;
+      this.isHeal = info.isHeal;
+      this.isTouch = info.isTouch;
+      this.isCommunityIll = info.isCommunityIll;
+      this.isPromise = info.isPromise;
     },
     /**
      * 获取上报信息
@@ -306,8 +426,8 @@ export default {
                 element._disableReport = false;
               }
             });
-            this.$set(this, "morning", res[0] || {});
-            this.$set(this, "afternoon", res[1] || {});
+            this.$set(this, "morning", res[0] || { _disableReport: true });
+            this.$set(this, "afternoon", res[1] || { _disableReport: true });
             this.isLoading = false;
             this.dateHaveData = this.search_date;
           } else {
@@ -345,8 +465,8 @@ export default {
               element._disableReport = false;
             }
           });
-          this.$set(this, "morning", res[0] || {});
-          this.$set(this, "afternoon", res[1] || {});
+          this.$set(this, "morning", res[0] || { _disableReport: true });
+          this.$set(this, "afternoon", res[1] || { _disableReport: true });
         });
     },
     /**
@@ -375,7 +495,7 @@ export default {
           password: "Admin123@"
         })
         .then(res => {
-          window.localStorage.setItem("token", res.token);
+          localStorage.setItem("token", res.token);
           this.getUserInfo();
           this.getReportData();
         });
@@ -400,22 +520,54 @@ export default {
      * 确认上报温度
      */
     confirmTemperature() {
-      let tempTemper = this.$refs.temperaturePicker.getValues()[0];
-      let noticeStr = "当前选择体温为" + tempTemper + "°C,确认上报?";
-      if (tempTemper >= 37.3) {
-        this.$dialog
-          .confirm({
-            title: "提示",
-            message: noticeStr
-          })
-          .then(() => {
-            this.showTemperaturePicker = false;
-            this.saveTemperature(tempTemper);
-          })
-          .catch(() => {});
+      this.temperatureToReport = this.$refs.temperaturePicker.getValues()[0];
+      // 上报前确认体温同时填确认表单
+      this.confirmBeforeSumbit = true;
+      // // 超过37.3进行体温上报确认
+      // let noticeStr = "当前选择体温为" + this.reportTemperature + "°C,确认上报?";
+      // if (this.reportTemperature >= 37.3) {
+      //   this.$dialog
+      //     .confirm({
+      //       title: "提示",
+      //       message: noticeStr
+      //     })
+      //     .then(() => {
+      //       this.showTemperaturePicker = false;
+      //       this.saveTemperature(this.reportTemperature);
+      //     })
+      //     .catch(() => {});
+      // } else {
+      //   this.showTemperaturePicker = false;
+      //   this.saveTemperature(this.reportTemperature);
+      // }
+    },
+    /**
+     * 在关闭弹窗前进行确认再保存
+     */
+    beforeClose(action, done) {
+      if (action === "confirm") {
+        if (
+          !this.isIll ||
+          (this.isIll === 1 && !this.isHeal) ||
+          !this.isTouch ||
+          !this.isCommunityIll
+        ) {
+          this.$toast({
+            duration: 1000,
+            message: "有未完成的选项，请继续选择"
+          });
+          return false;
+        }
+        if (!this.isPromise) {
+          this.$toast({ duration: 1000, message: "请勾选承诺书" });
+          done(false);
+        } else {
+          this.saveTemperature(this.temperatureToReport);
+          this.showTemperaturePicker = false;
+          done();
+        }
       } else {
-        this.showTemperaturePicker = false;
-        this.saveTemperature(tempTemper);
+        done();
       }
     },
     /**
@@ -436,6 +588,11 @@ export default {
           stu_no: this.stuNo,
           search_date: this.search_date,
           report_temperature: Number(temperature),
+          isIll: this.isIll,
+          isHeal: this.isHeal,
+          isTouch: this.isTouch,
+          isCommunityIll: this.isCommunityIll,
+          isPromise: this.isPromise ? 1 : 2,
           current_time: current_time,
           random_str: random_str,
           hash: hash
@@ -483,6 +640,7 @@ export default {
      */
     handleReport(type, disableReport) {
       this.report_type = type;
+
       if (disableReport) {
         this.$toast("非上报时间，不可上报");
         return false;
@@ -507,11 +665,60 @@ export default {
       this.calendarList = temp;
       this.search_date = this.$moment(new Date()).format("YYYY-MM-DD");
       this.getReportData();
+    },
+    /**
+     * 日期格式转化为时间戳
+     */
+    getUnixTime(dateStr) {
+      var newstr = dateStr.replace(/-/g, "/");
+      var date = new Date(newstr);
+      var time_str = date.getTime().toString();
+      return time_str.substr(0, 10);
+    },
+    /**
+     * 比较时间大小 aTime是否bTime：如果是，返回true，否则返回false
+     */
+    isBeforeTime(aTime, bTime) {
+      let flag = this.$moment(
+        this.$moment(aTime).format("YYYY-MM-DD HH:mm:ss")
+      ).isBefore(this.$moment(bTime).format("YYYY-MM-DD HH:mm:ss"));
+      return flag;
+    },
+    /**
+     * 倒计时
+     */
+    startCountdown(type) {
+      type == "suc" ? (this.sucReport = true) : (this.errReport = true);
+      this.secondInterval = setInterval(() => {
+        if (this.second === 0) {
+          clearInterval(this.secondInterval);
+          this.second = 5;
+          type == "suc" ? (this.sucReport = false) : (this.errReport = false);
+          this.getReportDataClearCache();
+        } else {
+          this.second = this.second - 1;
+        }
+      }, 1000);
+    },
+    /**
+     * 下拉刷新
+     */
+    onRefresh() {
+      this.getReportData();
+    },
+    /**
+     * 改变选项的值
+     */
+    changeRadio(target, val) {
+      if (target === "isIll") {
+        this.isHeal = null;
+      }
+      this[target] = val;
     }
   }
 };
 </script>
-<style scope>
+<style lang="scss" scope>
 .home {
   padding-top: 20px;
   height: 100%;
@@ -626,11 +833,114 @@ export default {
   background-color: #ff4d4d;
   margin-top: 2px;
 }
+.form-dialog {
+  height: 300px;
+  padding: 0 17px 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.my-choosed-temper {
+  border-bottom: 1px solid #ccc;
+  height: 40px;
+  line-height: 40px;
+  text-align: center;
+}
+.my-choosed-temper span.red {
+  color: #ff4d4d;
+}
+.my-choosed-temper span.blue {
+  color: rgba(82, 199, 202, 1);
+}
+.form-dialog-item {
+  margin-bottom: 20px;
+}
+.form-dialog-item_title {
+}
+.form-dialog-item_choose {
+  margin-top: 10px;
+}
+.isPromise {
+  height: 40px;
+  padding: 10px 17px;
+  border-top: 1px solid #ccc;
+  border-bottom: 1px solid #ccc;
+}
+.mint-toast {
+  z-index: 9999 !important;
+}
 .van-popup {
   height: auto !important;
 }
 .van-cell {
   min-height: 40px !important;
   line-height: 40px !important;
+}
+
+.radio-item {
+  display: flex;
+  justify-content: space-evenly;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  left: 0;
+  right: 0;
+  margin: 0 auto;
+  .tempVal {
+    width: 105px;
+    height: 28px;
+    line-height: 28px;
+    text-align: center;
+    color: #fff;
+    background: rgba(82, 199, 202, 1);
+    border-radius: 50px;
+  }
+}
+.radioBtn {
+  width: 56px;
+  height: 28px;
+  line-height: 28px;
+  background: rgba(255, 255, 255, 1);
+  border-radius: 28px;
+  text-align: center;
+  &.yes {
+    color: rgba(255, 77, 77, 1);
+    border: 1px solid rgba(255, 77, 77, 1);
+    &.checked {
+      color: #fff;
+      background-color: rgba(255, 77, 77, 1);
+    }
+  }
+  &.no {
+    color: #52c7ca;
+    border: 1px solid #52c7ca;
+    &.checked {
+      color: #fff;
+      background-color: #52c7ca;
+    }
+  }
+}
+.raidoDisable {
+  color: #fff !important;
+  background-color: #bfc0c6 !important;
+  border: 1px solid #bfc0c6 !important;
+}
+.promise-check {
+  display: flex;
+}
+.promise-check_handle {
+  flex: 1;
+  padding-left: 15px;
+}
+.promise-check__text {
+  flex: 6;
+  height: 40px;
+  font-size: 14px;
+  font-weight: 400;
+  color: rgba(146, 150, 156, 1);
+  line-height: 20px;
+}
+
+.van-popup .van-popup--top .van-notify {
+  z-index: 9999 !important;
 }
 </style>
