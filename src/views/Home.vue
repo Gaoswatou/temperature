@@ -565,7 +565,7 @@ export default {
           return false;
         }
         if (!this.isPromise) {
-          this.$toast({ duration: 1000, message: "请勾选承诺书" });
+          this.$toast({ duration: 1000, message: "请勾选承诺" });
           done(false);
         } else {
           this.saveTemperature(this.temperatureToReport);
