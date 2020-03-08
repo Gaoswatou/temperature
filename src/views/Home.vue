@@ -381,8 +381,15 @@ export default {
      * 获取上次上报的对应选项
      */
     getIsInfo() {
+      let { random_str, hash, current_time } = this.getHashParams();
       this.$axios
-        .post("report/get_is_info", {})
+        .post("report/get_is_info", {
+          id: this.handleId,
+          stu_no: this.stuNo,
+          current_time: current_time,
+          random_str: random_str,
+          hash: hash
+        })
         .then(res => {
           localStorage.setItem("is_info", res);
           this.setIsInfo(res);
@@ -640,7 +647,7 @@ export default {
      */
     handleReport(type, disableReport) {
       this.report_type = type;
-
+      this.handleId = type = "morning" ? this.morning.id : this.afternoon.id;
       if (disableReport) {
         this.$toast("非上报时间，不可上报");
         return false;
