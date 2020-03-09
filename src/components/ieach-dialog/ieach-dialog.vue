@@ -77,9 +77,9 @@ export default {
 .i-dialog {
   height: auto;
   width: 80%;
-  height: 60%;
+  height: 75%;
   position: fixed;
-  top: 40%;
+  top: 50%;
   transform: translateY(-50%);
   left: 0;
   right: 0;
@@ -107,7 +107,7 @@ export default {
   padding: 0 30px;
 }
 .i-dialog-footer__btn {
-  width: 118px;
+  width: 42%;
   height: 44px;
   height: 44px;
   line-height: 44px;

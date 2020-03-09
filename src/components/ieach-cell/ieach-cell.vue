@@ -46,5 +46,7 @@ export default {
 .i-cell__content {
   flex: 1;
   position: relative;
+  display: flex;
+  flex-wrap: wrap;
 }
 </style>

@@ -36,9 +36,20 @@
                 >未上报</span
               >
             </div>
-            <p class="report-time" v-if="morning.reportTime">
-              提交时间 <span>{{ morning.reportTime | formatDate }}</span>
-            </p>
+            <div class="report-status">
+              <p class="report-time">
+                体温上报：
+                <span>{{
+                  morning.reportStatus == 2 ? "已上报" : "待上报"
+                }}</span>
+              </p>
+              <p class="report-time">
+                流行病史调查：
+                <span>{{
+                  morning.reportStatus == 2 ? "已上报" : "待上报"
+                }}</span>
+              </p>
+            </div>
           </div>
         </van-cell>
         <van-cell>
@@ -66,9 +77,20 @@
                 >未上报</span
               >
             </div>
-            <p class="report-time" v-if="afternoon.reportTime">
-              提交时间 <span>{{ afternoon.reportTime | formatDate }}</span>
-            </p>
+            <div class="report-status">
+              <p class="report-time">
+                体温上报：
+                <span>{{
+                  afternoon.reportStatus == 2 ? "已上报" : "待上报"
+                }}</span>
+              </p>
+              <p class="report-time">
+                流行病史调查：
+                <span>{{
+                  afternoon.reportStatus == 2 ? "已上报" : "待上报"
+                }}</span>
+              </p>
+            </div>
           </div>
         </van-cell>
       </van-cell-group>
@@ -131,9 +153,8 @@
         <div class="info-dialog">
           <div style="display:flex;justify-content: center;">
             <van-icon name="clear" size="34" color="#FF4D4D" />
-            <div class="info-dialog_text">上报失败</div>
+            <div class="info-dialog_text">上报失败，稍后重试</div>
           </div>
-          <span style="color:#92969C;font-size: 12px;">请重新上报</span>
           <div class="info-dialog_btn error_btn">
             <span>({{ second }}秒)自动返回</span>
           </div>
@@ -236,8 +257,87 @@
               >
                 否
               </div>
-            </div></ieach-cell
-          >
+            </div>
+          </ieach-cell>
+          <ieach-cell title="近14天家人是否有以下国家旅居史（含辗转）？">
+            <div slot="content" class="check-item">
+              <div
+                :class="{
+                  checkBtn: true,
+                  no: true,
+                  checked: sojourn_0000 === 1
+                }"
+                @click="changeCheck('sojourn_0000')"
+              >
+                无
+              </div>
+            </div>
+            <div slot="content" class="check-item">
+              <div
+                :class="{
+                  checkBtn: true,
+                  yes: true,
+                  checked: sojourn_0081 === 1,
+                  checkDisable: sojourn_0000 === 1
+                }"
+                @click="changeCheck('sojourn_0081')"
+              >
+                日本
+              </div>
+            </div>
+            <div slot="content" class="check-item">
+              <div
+                :class="{
+                  checkBtn: true,
+                  yes: true,
+                  checked: sojourn_0082 === 1,
+                  checkDisable: sojourn_0000 === 1
+                }"
+                @click="changeCheck('sojourn_0082')"
+              >
+                韩国
+              </div>
+            </div>
+            <div slot="content" class="check-item">
+              <div
+                :class="{
+                  checkBtn: true,
+                  yes: true,
+                  checked: sojourn_65 === 1,
+                  checkDisable: sojourn_0000 === 1
+                }"
+                @click="changeCheck('sojourn_65')"
+              >
+                新加坡
+              </div>
+            </div>
+            <div slot="content" class="check-item">
+              <div
+                :class="{
+                  checkBtn: true,
+                  yes: true,
+                  checked: sojourn_39 === 1,
+                  checkDisable: sojourn_0000 === 1
+                }"
+                @click="changeCheck('sojourn_39')"
+              >
+                意大利
+              </div>
+            </div>
+            <div slot="content" class="check-item">
+              <div
+                :class="{
+                  checkBtn: true,
+                  yes: true,
+                  checked: sojourn_98 === 1,
+                  checkDisable: sojourn_0000 === 1
+                }"
+                @click="changeCheck('sojourn_98')"
+              >
+                伊朗
+              </div>
+            </div>
+          </ieach-cell>
           <ieach-cell title="当前体温">
             <div slot="content">
               <div class="radio-item">
@@ -367,6 +467,12 @@ export default {
       isTouch: null,
       isCommunityIll: null,
       isPromise: false,
+      sojourn_0000: 2,
+      sojourn_0081: 2,
+      sojourn_0082: 2,
+      sojourn_65: 2,
+      sojourn_39: 2,
+      sojourn_98: 2,
       nullResult: null
     };
   },
@@ -414,6 +520,10 @@ export default {
       this.isTouch = info.isTouch;
       this.isCommunityIll = info.isCommunityIll;
       this.isPromise = info.isPromise;
+      let sojournArr = info.sojourn.split("#");
+      sojournArr.forEach(el => {
+        this["sojourn_" + el] = 1;
+      });
     },
     /**
      * 获取上报信息
@@ -572,6 +682,23 @@ export default {
           });
           return false;
         }
+        if (
+          !(
+            this.sojourn_0000 === 1 ||
+            (this.sojourn_0000 === 2 &&
+              (this.sojourn_0081 === 1 ||
+                this.sojourn_0082 === 1 ||
+                this.sojourn_65 === 1 ||
+                this.sojourn_39 === 1 ||
+                this.sojourn_98 === 1))
+          )
+        ) {
+          this.$toast({
+            duration: 1000,
+            message: "有未完成的选项，请继续选择"
+          });
+          return false;
+        }
         if (!this.isPromise) {
           this.$toast({ duration: 1000, message: "请勾选承诺" });
           done(false);
@@ -585,10 +712,31 @@ export default {
       }
     },
     /**
+     * 获取有旅居的国家
+     */
+    getSojourn() {
+      let tempStr = "";
+      let dataSet = [
+        "sojourn_0000",
+        "sojourn_0081",
+        "sojourn_0082",
+        "sojourn_65",
+        "sojourn_39",
+        "sojourn_98"
+      ];
+      dataSet.forEach(el => {
+        if (this[el] === 1) {
+          tempStr += el.split("_")[1] + "#";
+        }
+      });
+      return tempStr.substring(0, tempStr.lastIndexOf("#"));
+    },
+    /**
      * 上传温度
      */
     saveTemperature(temperature) {
       let { random_str, hash, current_time } = this.getHashParams();
+      let sojourn = this.getSojourn();
       this.$axios
         .post("report/update", {
           id:
@@ -607,6 +755,7 @@ export default {
           isTouch: this.isTouch,
           isCommunityIll: this.isCommunityIll,
           isPromise: this.isPromise ? 1 : 2,
+          sojourn: sojourn,
           current_time: current_time,
           random_str: random_str,
           hash: hash
@@ -653,12 +802,15 @@ export default {
      * 选择温度
      */
     handleReport(type, disableReport) {
-      // console.log("disableReport: ", disableReport);
       this.handleId = type == "morning" ? this.morning.id : this.afternoon.id;
       let isInfo = localStorage.getItem("isInfo", this.$route.query.token);
-      isInfo && this.setIsInfo(isInfo);
-      !isInfo && this.getIsInfo();
+      if (isInfo) {
+        this.setIsInfo(isInfo);
+      } else {
+        this.getIsInfo();
+      }
       this.report_type = type;
+      // console.log("disableReport: ", disableReport);
       if (disableReport) {
         this.$toast("非上报时间，不可上报");
         return false;
@@ -725,7 +877,7 @@ export default {
       this.getReportData();
     },
     /**
-     * 改变选项的值
+     * 改变单选选项的值
      */
     changeRadio(target, val) {
       if (target === "isIll") {
@@ -735,6 +887,19 @@ export default {
         return false;
       }
       this[target] = val;
+    },
+    /**
+     * 改变多选选项的值
+     */
+    changeCheck(target) {
+      this[target] = this[target] === 1 ? 2 : 1;
+      if (this.sojourn_0000 === 1) {
+        this.sojourn_0081 = 2;
+        this.sojourn_0082 = 2;
+        this.sojourn_65 = 2;
+        this.sojourn_39 = 2;
+        this.sojourn_98 = 2;
+      }
     }
   }
 };
@@ -783,6 +948,10 @@ export default {
 }
 .report-btn span.btn-disable {
   background: #92969c;
+}
+.report-status {
+  display: flex;
+  justify-content: space-around;
 }
 .report-time {
   color: rgba(146, 150, 156, 1);
@@ -852,7 +1021,7 @@ export default {
 }
 .error_btn span {
   background-color: #ff4d4d;
-  margin-top: 2px;
+  margin-top: 20px;
 }
 .form-dialog {
   height: 300px;
@@ -922,9 +1091,15 @@ export default {
     }
   }
 }
-.radioBtn {
-  width: 56px;
-  height: 28px;
+.check-item {
+  width: 46%;
+  margin-right: 2%;
+  margin-top: 4px;
+}
+.radioBtn,
+.checkBtn {
+  width: 46%;
+  margin-right: 4%;
   line-height: 28px;
   background: rgba(255, 255, 255, 1);
   border-radius: 28px;
@@ -946,7 +1121,13 @@ export default {
     }
   }
 }
-.raidoDisable {
+.checkBtn {
+  width: 100%;
+  height: 24px;
+  line-height: 22px;
+}
+.raidoDisable,
+.checkDisable {
   color: #fff !important;
   background-color: #bfc0c6 !important;
   border: 1px solid #bfc0c6 !important;
@@ -963,7 +1144,7 @@ export default {
   height: 40px;
   font-size: 14px;
   font-weight: 400;
-  color: rgba(146, 150, 156, 1);
+  color: rgba(255, 77, 77, 1);
   line-height: 20px;
 }
 
