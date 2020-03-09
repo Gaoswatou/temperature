@@ -244,7 +244,7 @@
                 <div
                   class="tempVal"
                   :class="[
-                    tempVal,
+                    'tempVal',
                     Number(temperatureToReport) < 37.3 ? 'blue' : 'red'
                   ]"
                 >
@@ -653,6 +653,7 @@ export default {
      * 选择温度
      */
     handleReport(type, disableReport) {
+      // console.log("disableReport: ", disableReport);
       this.handleId = type == "morning" ? this.morning.id : this.afternoon.id;
       let isInfo = localStorage.getItem("isInfo", this.$route.query.token);
       isInfo && this.setIsInfo(isInfo);
@@ -729,6 +730,9 @@ export default {
     changeRadio(target, val) {
       if (target === "isIll") {
         this.isHeal = null;
+      }
+      if (target === "isHeal" && (this.isIll === 2 || !this.isIll)) {
+        return false;
       }
       this[target] = val;
     }
