@@ -167,7 +167,7 @@
               <div
                 :class="{
                   radioBtn: true,
-                  no: true,
+                  yes: true,
                   checked: isHeal === 2,
                   raidoDisable: isIll === 2 || !isIll
                 }"
@@ -178,7 +178,7 @@
               <div
                 :class="{
                   radioBtn: true,
-                  yes: true,
+                  no: true,
                   checked: isHeal === 1,
                   raidoDisable: isIll === 2 || !isIll
                 }"
