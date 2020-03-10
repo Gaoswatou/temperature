@@ -28,6 +28,7 @@
     "moment": "^2.24.0",
     "postcss-px2rem": "^0.3.0",
     "postcss-pxtorem": "^4.0.1",
+    "moment-timezone": "^0.5.28",
     "prettier": "^1.19.1",
     "sass": "^1.25.0",
     "sass-loader": "^8.0.2",

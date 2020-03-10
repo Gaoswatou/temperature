@@ -36,9 +36,20 @@
                 >未上报</span
               >
             </div>
-            <p class="report-time" v-if="morning.reportTime">
-              提交时间 <span>{{ morning.reportTime | formatDate }}</span>
-            </p>
+            <div class="report-status">
+              <p class="report-time">
+                体温上报：
+                <span>{{
+                  morning.reportStatus == 2 ? "已上报" : "待上报"
+                }}</span>
+              </p>
+              <p class="report-time">
+                流行病史调查：
+                <span>{{
+                  morning.reportStatus == 2 ? "已上报" : "待上报"
+                }}</span>
+              </p>
+            </div>
           </div>
         </van-cell>
         <van-cell>
@@ -66,9 +77,20 @@
                 >未上报</span
               >
             </div>
-            <p class="report-time" v-if="afternoon.reportTime">
-              提交时间 <span>{{ afternoon.reportTime | formatDate }}</span>
-            </p>
+            <div class="report-status">
+              <p class="report-time">
+                体温上报：
+                <span>{{
+                  afternoon.reportStatus == 2 ? "已上报" : "待上报"
+                }}</span>
+              </p>
+              <p class="report-time">
+                流行病史调查：
+                <span>{{
+                  afternoon.reportStatus == 2 ? "已上报" : "待上报"
+                }}</span>
+              </p>
+            </div>
           </div>
         </van-cell>
       </van-cell-group>
@@ -86,7 +108,7 @@
               ref="temperaturePicker"
               :columns="temperatureList"
               :visible-item-count="4"
-              :default-index="13"
+              :default-index="8"
             />
           </div>
           <div class="temperaturePicker-confirm_btn">
@@ -131,26 +153,238 @@
         <div class="info-dialog">
           <div style="display:flex;justify-content: center;">
             <van-icon name="clear" size="34" color="#FF4D4D" />
-            <div class="info-dialog_text">上报失败</div>
+            <div class="info-dialog_text">上报失败，稍后重试</div>
           </div>
-          <span
-            style="color:#92969C;font-size: 12px;
-"
-            >请重新上报</span
-          >
           <div class="info-dialog_btn error_btn">
             <span>({{ second }}秒)自动返回</span>
           </div>
         </div>
       </van-popup>
+      <ieach-dialog
+        title="流行病史调查"
+        v-model="confirmBeforeSumbit"
+        @before-close="beforeClose"
+        confirmText="提交"
+      >
+        <ieach-cell-group slot="content">
+          <ieach-cell title="本人及所在家庭是否有出现新冠肺炎病例？">
+            <div slot="content" class="radio-item">
+              <div
+                :class="{ radioBtn: true, yes: true, checked: isIll === 1 }"
+                @click="changeRadio('isIll', 1)"
+              >
+                是
+              </div>
+              <div
+                :class="{ radioBtn: true, no: true, checked: isIll === 2 }"
+                @click="changeRadio('isIll', 2)"
+              >
+                否
+              </div>
+            </div>
+          </ieach-cell>
+          <ieach-cell title="是否已治愈出院？">
+            <div slot="content" class="radio-item">
+              <div
+                :class="{
+                  radioBtn: true,
+                  yes: true,
+                  checked: isHeal === 2,
+                  raidoDisable: isIll === 2 || !isIll
+                }"
+                @click="changeRadio('isHeal', 2)"
+              >
+                否
+              </div>
+              <div
+                :class="{
+                  radioBtn: true,
+                  no: true,
+                  checked: isHeal === 1,
+                  raidoDisable: isIll === 2 || !isIll
+                }"
+                @click="changeRadio('isHeal', 1)"
+              >
+                是
+              </div>
+            </div>
+          </ieach-cell>
+          <ieach-cell
+            title="本人及所在家庭成员近14天内是否有接触新冠肺炎病人？"
+          >
+            <div slot="content" class="radio-item">
+              <div
+                :class="{
+                  radioBtn: true,
+                  yes: true,
+                  checked: isTouch === 1
+                }"
+                @click="changeRadio('isTouch', 1)"
+              >
+                是
+              </div>
+              <div
+                :class="{
+                  radioBtn: true,
+                  no: true,
+                  checked: isTouch === 2
+                }"
+                @click="changeRadio('isTouch', 2)"
+              >
+                否
+              </div>
+            </div></ieach-cell
+          >
+          <ieach-cell title="本人所在小区（村）近14天内是否有新冠肺炎病例？">
+            <div slot="content" class="radio-item">
+              <div
+                :class="{
+                  radioBtn: true,
+                  yes: true,
+                  checked: isCommunityIll === 1
+                }"
+                @click="changeRadio('isCommunityIll', 1)"
+              >
+                是
+              </div>
+              <div
+                :class="{
+                  radioBtn: true,
+                  no: true,
+                  checked: isCommunityIll === 2
+                }"
+                @click="changeRadio('isCommunityIll', 2)"
+              >
+                否
+              </div>
+            </div>
+          </ieach-cell>
+          <ieach-cell title="近14天家人是否有以下国家旅居史（含辗转）？">
+            <div slot="content" class="check-item">
+              <div
+                :class="{
+                  checkBtn: true,
+                  no: true,
+                  checked: sojourn_0000 === 1
+                }"
+                @click="changeCheck('sojourn_0000')"
+              >
+                无
+              </div>
+            </div>
+            <div slot="content" class="check-item">
+              <div
+                :class="{
+                  checkBtn: true,
+                  yes: true,
+                  checked: sojourn_0081 === 1,
+                  checkDisable: sojourn_0000 === 1
+                }"
+                @click="changeCheck('sojourn_0081')"
+              >
+                日本
+              </div>
+            </div>
+            <div slot="content" class="check-item">
+              <div
+                :class="{
+                  checkBtn: true,
+                  yes: true,
+                  checked: sojourn_0082 === 1,
+                  checkDisable: sojourn_0000 === 1
+                }"
+                @click="changeCheck('sojourn_0082')"
+              >
+                韩国
+              </div>
+            </div>
+            <div slot="content" class="check-item">
+              <div
+                :class="{
+                  checkBtn: true,
+                  yes: true,
+                  checked: sojourn_65 === 1,
+                  checkDisable: sojourn_0000 === 1
+                }"
+                @click="changeCheck('sojourn_65')"
+              >
+                新加坡
+              </div>
+            </div>
+            <div slot="content" class="check-item">
+              <div
+                :class="{
+                  checkBtn: true,
+                  yes: true,
+                  checked: sojourn_39 === 1,
+                  checkDisable: sojourn_0000 === 1
+                }"
+                @click="changeCheck('sojourn_39')"
+              >
+                意大利
+              </div>
+            </div>
+            <div slot="content" class="check-item">
+              <div
+                :class="{
+                  checkBtn: true,
+                  yes: true,
+                  checked: sojourn_98 === 1,
+                  checkDisable: sojourn_0000 === 1
+                }"
+                @click="changeCheck('sojourn_98')"
+              >
+                伊朗
+              </div>
+            </div>
+          </ieach-cell>
+          <ieach-cell title="当前体温">
+            <div slot="content">
+              <div class="radio-item">
+                <div
+                  class="tempVal"
+                  :class="[
+                    'tempVal',
+                    Number(temperatureToReport) < 37.3 ? 'blue' : 'red'
+                  ]"
+                >
+                  {{ temperatureToReport }}
+                </div>
+              </div>
+            </div>
+          </ieach-cell>
+          <ieach-cell>
+            <div slot="container">
+              <div class="promise-check">
+                <van-checkbox
+                  class="promise-check_handle"
+                  v-model="isPromise"
+                  icon-size="24px"
+                ></van-checkbox>
+                <div class="promise-check__text">
+                  我郑重承诺，本人对所报信息的真实性完整性负责。
+                </div>
+              </div>
+            </div>
+          </ieach-cell>
+        </ieach-cell-group>
+      </ieach-dialog>
     </van-pull-refresh>
   </div>
 </template>
 
 <script>
 import md5 from "js-md5";
+import ieachDialog from "components/ieach-dialog/ieach-dialog";
+import ieachCellGroup from "components/ieach-cell-group/ieach-cell-group";
+import ieachCell from "components/ieach-cell/ieach-cell";
 export default {
   name: "Home",
+  components: {
+    ieachDialog,
+    ieachCellGroup,
+    ieachCell
+  },
   data() {
     return {
       second: 5,
@@ -164,13 +398,15 @@ export default {
         reportStartTime: "",
         reportEndTime: "",
         reportTemperature: "",
-        reportTime: ""
+        reportTime: "",
+        _disableReport: true
       },
       afternoon: {
         reportStartTime: "",
         reportEndTime: "",
         reportTemperature: "",
-        reportTime: ""
+        reportTime: "",
+        _disableReport: true
       },
       temperatureList: [
         "36.0",
@@ -224,13 +460,26 @@ export default {
       showCalendar: false,
       report_type: "morning",
       stuNo: "",
+      temperatureToReport: "36.8",
+      confirmBeforeSumbit: false,
+      isIll: null,
+      isHeal: null,
+      isTouch: null,
+      isCommunityIll: null,
+      isPromise: false,
+      sojourn_0000: 2,
+      sojourn_0081: 2,
+      sojourn_0082: 2,
+      sojourn_65: 2,
+      sojourn_39: 2,
+      sojourn_98: 2,
       nullResult: null
     };
   },
   mounted() {
     this.stuNo = this.$route.query.uid;
-    // this.stu_no = 1;
-    this.handleAuth();
+    localStorage.setItem("token", this.$route.query.token);
+    this.getUserInfo();
     this.getCalendarList();
   },
   filters: {
@@ -240,26 +489,41 @@ export default {
   },
   methods: {
     /**
-     * 倒计时
+     * 获取上次上报的对应选项
      */
-    startCountdown(type) {
-      type == "suc" ? (this.sucReport = true) : (this.errReport = true);
-      this.secondInterval = setInterval(() => {
-        if (this.second === 0) {
-          clearInterval(this.secondInterval);
-          this.second = 5;
-          type == "suc" ? (this.sucReport = false) : (this.errReport = false);
-          this.getReportDataClearCache();
-        } else {
-          this.second = this.second - 1;
-        }
-      }, 1000);
+    getIsInfo() {
+      let { random_str, hash, current_time } = this.getHashParams();
+      this.$axios({
+        url: "report/get_is_info",
+        method: "post",
+        data: {
+          id: this.handleId,
+          stu_no: this.stuNo,
+          current_time: current_time,
+          random_str: random_str,
+          hash: hash
+        },
+        showLoad: false
+      })
+        .then(res => {
+          localStorage.setItem("is_info", res);
+          this.setIsInfo(res);
+        })
+        .catch(() => {});
     },
     /**
-     * 下拉刷新
+     * 将缓存里面表单的默认选项读出来
      */
-    onRefresh() {
-      this.getReportData();
+    setIsInfo(info) {
+      this.isIll = info.isIll;
+      this.isHeal = info.isHeal;
+      this.isTouch = info.isTouch;
+      this.isCommunityIll = info.isCommunityIll;
+      this.isPromise = info.isPromise;
+      let sojournArr = info.sojourn.split("#");
+      sojournArr.forEach(el => {
+        this["sojourn_" + el] = 1;
+      });
     },
     /**
      * 获取上报信息
@@ -278,20 +542,23 @@ export default {
           if (res) {
             res.forEach(element => {
               if (
-                this.$moment(new Date()).isBefore(element.reportStartTime) ||
-                this.$moment(element.reportStartTime).isBefore(new Date())
+                this.isBeforeTime(new Date(), element.reportStartTime) ||
+                this.isBeforeTime(element.reportEndTime, new Date())
               ) {
                 element._disableReport = true;
               } else {
                 element._disableReport = false;
               }
             });
-            this.$set(this, "morning", res[0] || {});
-            this.$set(this, "afternoon", res[1] || {});
+            this.$set(this, "morning", res[0] || { _disableReport: true });
+            this.$set(this, "afternoon", res[1] || { _disableReport: true });
             this.isLoading = false;
             this.dateHaveData = this.search_date;
           } else {
+            this.$set(this, "morning", res[0] || { _disableReport: true });
+            this.$set(this, "afternoon", res[1] || { _disableReport: true });
             this.search_date = this.dateHaveData;
+            this.isLoading = false;
           }
         })
         .catch(() => {
@@ -312,8 +579,18 @@ export default {
           hash: hash
         })
         .then(res => {
-          this.$set(this, "morning", res[0] || {});
-          this.$set(this, "afternoon", res[1] || {});
+          res.forEach(element => {
+            if (
+              this.isBeforeTime(new Date(), element.reportStartTime) ||
+              this.isBeforeTime(element.reportEndTime, new Date())
+            ) {
+              element._disableReport = true;
+            } else {
+              element._disableReport = false;
+            }
+          });
+          this.$set(this, "morning", res[0] || { _disableReport: true });
+          this.$set(this, "afternoon", res[1] || { _disableReport: true });
         });
     },
     /**
@@ -342,7 +619,7 @@ export default {
           password: "Admin123@"
         })
         .then(res => {
-          window.localStorage.setItem("token", res.token);
+          localStorage.setItem("token", res.token);
           this.getUserInfo();
           this.getReportData();
         });
@@ -367,15 +644,99 @@ export default {
      * 确认上报温度
      */
     confirmTemperature() {
-      let tempTemper = this.$refs.temperaturePicker.getValues()[0];
-      this.showTemperaturePicker = false;
-      this.saveTemperature(tempTemper);
+      this.temperatureToReport = this.$refs.temperaturePicker.getValues()[0];
+      // 上报前确认体温同时填确认表单
+      this.confirmBeforeSumbit = true;
+      // // 超过37.3进行体温上报确认
+      // let noticeStr = "当前选择体温为" + this.reportTemperature + "°C,确认上报?";
+      // if (this.reportTemperature >= 37.3) {
+      //   this.$dialog
+      //     .confirm({
+      //       title: "提示",
+      //       message: noticeStr
+      //     })
+      //     .then(() => {
+      //       this.showTemperaturePicker = false;
+      //       this.saveTemperature(this.reportTemperature);
+      //     })
+      //     .catch(() => {});
+      // } else {
+      //   this.showTemperaturePicker = false;
+      //   this.saveTemperature(this.reportTemperature);
+      // }
+    },
+    /**
+     * 在关闭弹窗前进行确认再保存
+     */
+    beforeClose(action, done) {
+      if (action === "confirm") {
+        if (
+          !this.isIll ||
+          (this.isIll === 1 && !this.isHeal) ||
+          !this.isTouch ||
+          !this.isCommunityIll
+        ) {
+          this.$toast({
+            duration: 1000,
+            message: "有未完成的选项，请继续选择"
+          });
+          return false;
+        }
+        if (
+          !(
+            this.sojourn_0000 === 1 ||
+            (this.sojourn_0000 === 2 &&
+              (this.sojourn_0081 === 1 ||
+                this.sojourn_0082 === 1 ||
+                this.sojourn_65 === 1 ||
+                this.sojourn_39 === 1 ||
+                this.sojourn_98 === 1))
+          )
+        ) {
+          this.$toast({
+            duration: 1000,
+            message: "有未完成的选项，请继续选择"
+          });
+          return false;
+        }
+        if (!this.isPromise) {
+          this.$toast({ duration: 1000, message: "请勾选承诺" });
+          done(false);
+        } else {
+          this.saveTemperature(this.temperatureToReport);
+          this.showTemperaturePicker = false;
+          done();
+        }
+      } else {
+        done();
+      }
+    },
+    /**
+     * 获取有旅居的国家
+     */
+    getSojourn() {
+      let tempStr = "";
+      let dataSet = [
+        "sojourn_0000",
+        "sojourn_0081",
+        "sojourn_0082",
+        "sojourn_65",
+        "sojourn_39",
+        "sojourn_98"
+      ];
+      dataSet.forEach(el => {
+        if (this[el] === 1) {
+          tempStr += el.split("_")[1] + "#";
+        }
+      });
+      return tempStr.substring(0, tempStr.lastIndexOf("#"));
     },
     /**
      * 上传温度
      */
     saveTemperature(temperature) {
       let { random_str, hash, current_time } = this.getHashParams();
+      let sojourn = this.getSojourn();
       this.$axios
         .post("report/update", {
           id:
@@ -387,7 +748,14 @@ export default {
               ? this.morning.version
               : this.afternoon.version,
           stu_no: this.stuNo,
+          search_date: this.search_date,
           report_temperature: Number(temperature),
+          isIll: this.isIll,
+          isHeal: this.isHeal,
+          isTouch: this.isTouch,
+          isCommunityIll: this.isCommunityIll,
+          isPromise: this.isPromise ? 1 : 2,
+          sojourn: sojourn,
           current_time: current_time,
           random_str: random_str,
           hash: hash
@@ -404,7 +772,9 @@ export default {
      * 获取请求参数中的时间戳、salt、hash
      */
     getHashParams() {
-      let current_time = this.$moment().unix();
+      let current_time = this.getUnixTime(
+        this.$moment(Date.now()).format("YYYY-MM-DD HH:mm:ss")
+      );
       let random_str = this.getRandomStr(12);
       let salt = "luqixiuzijiayougan";
       let hash = md5(current_time + random_str + salt);
@@ -432,7 +802,15 @@ export default {
      * 选择温度
      */
     handleReport(type, disableReport) {
+      this.handleId = type == "morning" ? this.morning.id : this.afternoon.id;
+      let isInfo = localStorage.getItem("isInfo", this.$route.query.token);
+      if (isInfo) {
+        this.setIsInfo(isInfo);
+      } else {
+        this.getIsInfo();
+      }
       this.report_type = type;
+      // console.log("disableReport: ", disableReport);
       if (disableReport) {
         this.$toast("非上报时间，不可上报");
         return false;
@@ -456,11 +834,77 @@ export default {
       }
       this.calendarList = temp;
       this.search_date = this.$moment(new Date()).format("YYYY-MM-DD");
+      this.getReportData();
+    },
+    /**
+     * 日期格式转化为时间戳
+     */
+    getUnixTime(dateStr) {
+      var newstr = dateStr.replace(/-/g, "/");
+      var date = new Date(newstr);
+      var time_str = date.getTime().toString();
+      return time_str.substr(0, 10);
+    },
+    /**
+     * 比较时间大小 aTime是否bTime：如果是，返回true，否则返回false
+     */
+    isBeforeTime(aTime, bTime) {
+      let flag = this.$moment(
+        this.$moment(aTime).format("YYYY-MM-DD HH:mm:ss")
+      ).isBefore(this.$moment(bTime).format("YYYY-MM-DD HH:mm:ss"));
+      return flag;
+    },
+    /**
+     * 倒计时
+     */
+    startCountdown(type) {
+      type == "suc" ? (this.sucReport = true) : (this.errReport = true);
+      this.secondInterval = setInterval(() => {
+        if (this.second === 0) {
+          clearInterval(this.secondInterval);
+          this.second = 5;
+          type == "suc" ? (this.sucReport = false) : (this.errReport = false);
+          this.getReportDataClearCache();
+        } else {
+          this.second = this.second - 1;
+        }
+      }, 1000);
+    },
+    /**
+     * 下拉刷新
+     */
+    onRefresh() {
+      this.getReportData();
+    },
+    /**
+     * 改变单选选项的值
+     */
+    changeRadio(target, val) {
+      if (target === "isIll") {
+        this.isHeal = null;
+      }
+      if (target === "isHeal" && (this.isIll === 2 || !this.isIll)) {
+        return false;
+      }
+      this[target] = val;
+    },
+    /**
+     * 改变多选选项的值
+     */
+    changeCheck(target) {
+      this[target] = this[target] === 1 ? 2 : 1;
+      if (this.sojourn_0000 === 1) {
+        this.sojourn_0081 = 2;
+        this.sojourn_0082 = 2;
+        this.sojourn_65 = 2;
+        this.sojourn_39 = 2;
+        this.sojourn_98 = 2;
+      }
     }
   }
 };
 </script>
-<style scope>
+<style lang="scss" scope>
 .home {
   padding-top: 20px;
   height: 100%;
@@ -504,6 +948,10 @@ export default {
 }
 .report-btn span.btn-disable {
   background: #92969c;
+}
+.report-status {
+  display: flex;
+  justify-content: space-around;
 }
 .report-time {
   color: rgba(146, 150, 156, 1);
@@ -573,7 +1021,42 @@ export default {
 }
 .error_btn span {
   background-color: #ff4d4d;
-  margin-top: 2px;
+  margin-top: 20px;
+}
+.form-dialog {
+  height: 300px;
+  padding: 0 17px 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.my-choosed-temper {
+  border-bottom: 1px solid #ccc;
+  height: 40px;
+  line-height: 40px;
+  text-align: center;
+}
+.my-choosed-temper span.red {
+  color: #ff4d4d;
+}
+.my-choosed-temper span.blue {
+  color: rgba(82, 199, 202, 1);
+}
+.form-dialog-item {
+  margin-bottom: 20px;
+}
+.form-dialog-item_title {
+}
+.form-dialog-item_choose {
+  margin-top: 10px;
+}
+.isPromise {
+  height: 40px;
+  padding: 10px 17px;
+  border-top: 1px solid #ccc;
+  border-bottom: 1px solid #ccc;
+}
+.mint-toast {
+  z-index: 9999 !important;
 }
 .van-popup {
   height: auto !important;
@@ -581,5 +1064,91 @@ export default {
 .van-cell {
   min-height: 40px !important;
   line-height: 40px !important;
+}
+
+.radio-item {
+  display: flex;
+  justify-content: space-evenly;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  left: 0;
+  right: 0;
+  margin: 0 auto;
+  .tempVal {
+    width: 105px;
+    height: 28px;
+    line-height: 28px;
+    text-align: center;
+    color: #fff;
+
+    border-radius: 50px;
+    &.red {
+      background: #ff4d4d;
+    }
+    &.blue {
+      background: rgba(82, 199, 202, 1);
+    }
+  }
+}
+.check-item {
+  width: 46%;
+  margin-right: 2%;
+  margin-top: 4px;
+}
+.radioBtn,
+.checkBtn {
+  width: 46%;
+  margin-right: 4%;
+  line-height: 28px;
+  background: rgba(255, 255, 255, 1);
+  border-radius: 28px;
+  text-align: center;
+  &.yes {
+    color: rgba(255, 77, 77, 1);
+    border: 1px solid rgba(255, 77, 77, 1);
+    &.checked {
+      color: #fff;
+      background-color: rgba(255, 77, 77, 1);
+    }
+  }
+  &.no {
+    color: #52c7ca;
+    border: 1px solid #52c7ca;
+    &.checked {
+      color: #fff;
+      background-color: #52c7ca;
+    }
+  }
+}
+.checkBtn {
+  width: 100%;
+  height: 24px;
+  line-height: 22px;
+}
+.raidoDisable,
+.checkDisable {
+  color: #fff !important;
+  background-color: #bfc0c6 !important;
+  border: 1px solid #bfc0c6 !important;
+}
+.promise-check {
+  display: flex;
+}
+.promise-check_handle {
+  flex: 1;
+  padding-left: 15px;
+}
+.promise-check__text {
+  flex: 6;
+  height: 40px;
+  font-size: 14px;
+  font-weight: 400;
+  color: rgba(255, 77, 77, 1);
+  line-height: 20px;
+}
+
+.van-popup .van-popup--top .van-notify {
+  z-index: 9999 !important;
 }
 </style>
