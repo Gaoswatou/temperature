@@ -160,216 +160,243 @@
           </div>
         </div>
       </van-popup>
-      <ieach-dialog
-        title="流行病史调查"
-        v-model="confirmBeforeSumbit"
-        @before-close="beforeClose"
-        confirmText="提交"
-      >
-        <ieach-cell-group slot="content">
-          <ieach-cell title="本人及所在家庭是否有出现新冠肺炎病例？">
-            <div slot="content" class="radio-item">
-              <div
-                :class="{ radioBtn: true, yes: true, checked: isIll === 1 }"
-                @click="changeRadio('isIll', 1)"
-              >
-                是
-              </div>
-              <div
-                :class="{ radioBtn: true, no: true, checked: isIll === 2 }"
-                @click="changeRadio('isIll', 2)"
-              >
-                否
-              </div>
-            </div>
-          </ieach-cell>
-          <ieach-cell title="是否已治愈出院？">
-            <div slot="content" class="radio-item">
-              <div
-                :class="{
-                  radioBtn: true,
-                  yes: true,
-                  checked: isHeal === 2,
-                  raidoDisable: isIll === 2 || !isIll
-                }"
-                @click="changeRadio('isHeal', 2)"
-              >
-                否
-              </div>
-              <div
-                :class="{
-                  radioBtn: true,
-                  no: true,
-                  checked: isHeal === 1,
-                  raidoDisable: isIll === 2 || !isIll
-                }"
-                @click="changeRadio('isHeal', 1)"
-              >
-                是
-              </div>
-            </div>
-          </ieach-cell>
-          <ieach-cell
-            title="本人及所在家庭成员近14天内是否有接触新冠肺炎病人？"
-          >
-            <div slot="content" class="radio-item">
-              <div
-                :class="{
-                  radioBtn: true,
-                  yes: true,
-                  checked: isTouch === 1
-                }"
-                @click="changeRadio('isTouch', 1)"
-              >
-                是
-              </div>
-              <div
-                :class="{
-                  radioBtn: true,
-                  no: true,
-                  checked: isTouch === 2
-                }"
-                @click="changeRadio('isTouch', 2)"
-              >
-                否
-              </div>
-            </div></ieach-cell
-          >
-          <ieach-cell title="本人所在小区（村）近14天内是否有新冠肺炎病例？">
-            <div slot="content" class="radio-item">
-              <div
-                :class="{
-                  radioBtn: true,
-                  yes: true,
-                  checked: isCommunityIll === 1
-                }"
-                @click="changeRadio('isCommunityIll', 1)"
-              >
-                是
-              </div>
-              <div
-                :class="{
-                  radioBtn: true,
-                  no: true,
-                  checked: isCommunityIll === 2
-                }"
-                @click="changeRadio('isCommunityIll', 2)"
-              >
-                否
-              </div>
-            </div>
-          </ieach-cell>
-          <ieach-cell title="近14天家人是否有以下国家旅居史（含辗转）？">
-            <div slot="content" class="check-item">
-              <div
-                :class="{
-                  checkBtn: true,
-                  no: true,
-                  checked: sojourn_0000 === 1
-                }"
-                @click="changeCheck('sojourn_0000')"
-              >
-                无
-              </div>
-            </div>
-            <div slot="content" class="check-item">
-              <div
-                :class="{
-                  checkBtn: true,
-                  yes: true,
-                  checked: sojourn_0081 === 1,
-                  checkDisable: sojourn_0000 === 1
-                }"
-                @click="changeCheck('sojourn_0081')"
-              >
-                日本
-              </div>
-            </div>
-            <div slot="content" class="check-item">
-              <div
-                :class="{
-                  checkBtn: true,
-                  yes: true,
-                  checked: sojourn_0082 === 1,
-                  checkDisable: sojourn_0000 === 1
-                }"
-                @click="changeCheck('sojourn_0082')"
-              >
-                韩国
-              </div>
-            </div>
-            <div slot="content" class="check-item">
-              <div
-                :class="{
-                  checkBtn: true,
-                  yes: true,
-                  checked: sojourn_65 === 1,
-                  checkDisable: sojourn_0000 === 1
-                }"
-                @click="changeCheck('sojourn_65')"
-              >
-                新加坡
-              </div>
-            </div>
-            <div slot="content" class="check-item">
-              <div
-                :class="{
-                  checkBtn: true,
-                  yes: true,
-                  checked: sojourn_39 === 1,
-                  checkDisable: sojourn_0000 === 1
-                }"
-                @click="changeCheck('sojourn_39')"
-              >
-                意大利
-              </div>
-            </div>
-            <div slot="content" class="check-item">
-              <div
-                :class="{
-                  checkBtn: true,
-                  yes: true,
-                  checked: sojourn_98 === 1,
-                  checkDisable: sojourn_0000 === 1
-                }"
-                @click="changeCheck('sojourn_98')"
-              >
-                伊朗
-              </div>
-            </div>
-          </ieach-cell>
-          <ieach-cell title="当前体温">
-            <div slot="content">
-              <div class="radio-item">
-                <div
-                  class="tempVal"
-                  :class="[
-                    'tempVal',
-                    Number(temperatureToReport) < 37.3 ? 'blue' : 'red'
-                  ]"
-                >
-                  {{ temperatureToReport }}
-                </div>
-              </div>
-            </div>
-          </ieach-cell>
-          <ieach-cell>
-            <div slot="container">
-              <div class="promise-check">
-                <van-checkbox
-                  class="promise-check_handle"
-                  v-model="isPromise"
-                  icon-size="24px"
-                ></van-checkbox>
-                <div class="promise-check__text">
-                  我郑重承诺，本人对所报信息的真实性完整性负责。
-                </div>
-              </div>
-            </div>
-          </ieach-cell>
-        </ieach-cell-group>
-      </ieach-dialog>
     </van-pull-refresh>
+    <ieach-dialog
+      title="流行病史调查"
+      v-model="confirmBeforeSumbit"
+      @before-close="beforeClose"
+      confirmText="提交"
+    >
+      <ieach-cell-group slot="content">
+        <ieach-cell title="本人及所在家庭是否有出现新冠肺炎病例？">
+          <div slot="content" class="radio-item">
+            <div
+              :class="{ radioBtn: true, yes: true, checked: isIll === 1 }"
+              @click="changeRadio('isIll', 1)"
+            >
+              是
+            </div>
+            <div
+              :class="{ radioBtn: true, no: true, checked: isIll === 2 }"
+              @click="changeRadio('isIll', 2)"
+            >
+              否
+            </div>
+          </div>
+        </ieach-cell>
+        <ieach-cell title="是否已治愈出院？">
+          <div slot="content" class="radio-item">
+            <div
+              :class="{
+                radioBtn: true,
+                yes: true,
+                checked: isHeal === 2,
+                raidoDisable: isIll === 2 || !isIll
+              }"
+              @click="changeRadio('isHeal', 2)"
+            >
+              否
+            </div>
+            <div
+              :class="{
+                radioBtn: true,
+                no: true,
+                checked: isHeal === 1,
+                raidoDisable: isIll === 2 || !isIll
+              }"
+              @click="changeRadio('isHeal', 1)"
+            >
+              是
+            </div>
+          </div>
+        </ieach-cell>
+        <ieach-cell title="本人及所在家庭成员近14天内是否有接触新冠肺炎病人？">
+          <div slot="content" class="radio-item">
+            <div
+              :class="{
+                radioBtn: true,
+                yes: true,
+                checked: isTouch === 1
+              }"
+              @click="changeRadio('isTouch', 1)"
+            >
+              是
+            </div>
+            <div
+              :class="{
+                radioBtn: true,
+                no: true,
+                checked: isTouch === 2
+              }"
+              @click="changeRadio('isTouch', 2)"
+            >
+              否
+            </div>
+          </div></ieach-cell
+        >
+        <ieach-cell title="本人所在小区（村）近14天内是否有新冠肺炎病例？">
+          <div slot="content" class="radio-item">
+            <div
+              :class="{
+                radioBtn: true,
+                yes: true,
+                checked: isCommunityIll === 1
+              }"
+              @click="changeRadio('isCommunityIll', 1)"
+            >
+              是
+            </div>
+            <div
+              :class="{
+                radioBtn: true,
+                no: true,
+                checked: isCommunityIll === 2
+              }"
+              @click="changeRadio('isCommunityIll', 2)"
+            >
+              否
+            </div>
+          </div>
+        </ieach-cell>
+        <ieach-cell title="近14天家人是否有国外旅居史（含辗转）？">
+          <div slot="content" class="radio-item">
+            <div
+              :class="{
+                radioBtn: true,
+                yes: true,
+                checked: isSojourn === 1
+              }"
+              @click="changeRadio('isSojourn', 1)"
+            >
+              是
+            </div>
+            <div
+              :class="{
+                radioBtn: true,
+                no: true,
+                checked: isSojourn === 2
+              }"
+              @click="changeRadio('isSojourn', 2)"
+            >
+              否
+            </div>
+            <van-field
+              v-if="isSojourn === 1"
+              v-model="sojourn"
+              :maxlength="50"
+              placeholder="请输入途径国家"
+              style="padding:0 !important;text-align:center !important"
+            />
+          </div>
+          <!-- <div slot="content" class="check-item">
+            <div
+              :class="{
+                checkBtn: true,
+                no: true,
+                checked: sojourn_0000 === 1
+              }"
+              @click="changeCheck('sojourn_0000')"
+            >
+              无
+            </div>
+          </div>
+          <div slot="content" class="check-item">
+            <div
+              :class="{
+                checkBtn: true,
+                yes: true,
+                checked: sojourn_0081 === 1,
+                checkDisable: sojourn_0000 === 1
+              }"
+              @click="changeCheck('sojourn_0081')"
+            >
+              日本
+            </div>
+          </div>
+          <div slot="content" class="check-item">
+            <div
+              :class="{
+                checkBtn: true,
+                yes: true,
+                checked: sojourn_0082 === 1,
+                checkDisable: sojourn_0000 === 1
+              }"
+              @click="changeCheck('sojourn_0082')"
+            >
+              韩国
+            </div>
+          </div>
+          <div slot="content" class="check-item">
+            <div
+              :class="{
+                checkBtn: true,
+                yes: true,
+                checked: sojourn_65 === 1,
+                checkDisable: sojourn_0000 === 1
+              }"
+              @click="changeCheck('sojourn_65')"
+            >
+              新加坡
+            </div>
+          </div>
+          <div slot="content" class="check-item">
+            <div
+              :class="{
+                checkBtn: true,
+                yes: true,
+                checked: sojourn_39 === 1,
+                checkDisable: sojourn_0000 === 1
+              }"
+              @click="changeCheck('sojourn_39')"
+            >
+              意大利
+            </div>
+          </div>
+          <div slot="content" class="check-item">
+            <div
+              :class="{
+                checkBtn: true,
+                yes: true,
+                checked: sojourn_98 === 1,
+                checkDisable: sojourn_0000 === 1
+              }"
+              @click="changeCheck('sojourn_98')"
+            >
+              伊朗
+            </div>
+          </div> -->
+        </ieach-cell>
+        <ieach-cell title="当前体温">
+          <div slot="content">
+            <div class="radio-item">
+              <div
+                class="tempVal"
+                :class="[
+                  'tempVal',
+                  Number(temperatureToReport) < 37.3 ? 'blue' : 'red'
+                ]"
+              >
+                {{ temperatureToReport }}
+              </div>
+            </div>
+          </div>
+        </ieach-cell>
+        <ieach-cell>
+          <div slot="container">
+            <div class="promise-check">
+              <van-checkbox
+                class="promise-check_handle"
+                v-model="isPromise"
+                icon-size="24px"
+              ></van-checkbox>
+              <div class="promise-check__text">
+                我郑重承诺，本人对所报信息的真实性完整性负责。
+              </div>
+            </div>
+          </div>
+        </ieach-cell>
+      </ieach-cell-group>
+    </ieach-dialog>
   </div>
 </template>
 
@@ -467,6 +494,8 @@ export default {
       isTouch: null,
       isCommunityIll: null,
       isPromise: false,
+      isSojourn: null,
+      sojourn: "",
       sojourn_0000: 2,
       sojourn_0081: 2,
       sojourn_0082: 2,
@@ -520,10 +549,12 @@ export default {
       this.isTouch = info.isTouch;
       this.isCommunityIll = info.isCommunityIll;
       this.isPromise = info.isPromise;
-      let sojournArr = info.sojourn.split("#");
-      sojournArr.forEach(el => {
-        this["sojourn_" + el] = 1;
-      });
+      this.isSojourn = info.sojourn ? (info.sojourn === "0000" ? 2 : 1) : null;
+      this.sojourn = info.sojourn === "0000" ? "" : info.sojourn;
+      // let sojournArr = info.sojourn.split("#");
+      // sojournArr.forEach(el => {
+      //   this["sojourn_" + el] = 1;
+      // });
     },
     /**
      * 获取上报信息
@@ -674,7 +705,8 @@ export default {
           !this.isIll ||
           (this.isIll === 1 && !this.isHeal) ||
           !this.isTouch ||
-          !this.isCommunityIll
+          !this.isCommunityIll ||
+          !this.isSojourn
         ) {
           this.$toast({
             duration: 1000,
@@ -682,23 +714,30 @@ export default {
           });
           return false;
         }
-        if (
-          !(
-            this.sojourn_0000 === 1 ||
-            (this.sojourn_0000 === 2 &&
-              (this.sojourn_0081 === 1 ||
-                this.sojourn_0082 === 1 ||
-                this.sojourn_65 === 1 ||
-                this.sojourn_39 === 1 ||
-                this.sojourn_98 === 1))
-          )
-        ) {
+        if (this.isSojourn === 1 && !this.sojourn) {
           this.$toast({
             duration: 1000,
-            message: "有未完成的选项，请继续选择"
+            message: "请填写途径国家"
           });
           return false;
         }
+        // if (
+        //   !(
+        //     this.sojourn_0000 === 1 ||
+        //     (this.sojourn_0000 === 2 &&
+        //       (this.sojourn_0081 === 1 ||
+        //         this.sojourn_0082 === 1 ||
+        //         this.sojourn_65 === 1 ||
+        //         this.sojourn_39 === 1 ||
+        //         this.sojourn_98 === 1))
+        //   )
+        // ) {
+        //   this.$toast({
+        //     duration: 1000,
+        //     message: "有未完成的选项，请继续选择"
+        //   });
+        //   return false;
+        // }
         if (!this.isPromise) {
           this.$toast({ duration: 1000, message: "请勾选承诺" });
           done(false);
@@ -736,7 +775,7 @@ export default {
      */
     saveTemperature(temperature) {
       let { random_str, hash, current_time } = this.getHashParams();
-      let sojourn = this.getSojourn();
+      // let sojourn = this.getSojourn();
       this.$axios
         .post("report/update", {
           id:
@@ -755,7 +794,7 @@ export default {
           isTouch: this.isTouch,
           isCommunityIll: this.isCommunityIll,
           isPromise: this.isPromise ? 1 : 2,
-          sojourn: sojourn,
+          sojourn: this.isSojourn === 1 ? this.sojourn : "0000",
           current_time: current_time,
           random_str: random_str,
           hash: hash
@@ -1068,6 +1107,7 @@ export default {
 
 .radio-item {
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-evenly;
   position: absolute;
   top: 50%;
@@ -1150,5 +1190,8 @@ export default {
 
 .van-popup .van-popup--top .van-notify {
   z-index: 9999 !important;
+}
+.van-cell .van-field input {
+  text-align: center !important;
 }
 </style>
